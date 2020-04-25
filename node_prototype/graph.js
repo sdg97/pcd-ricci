@@ -2,6 +2,7 @@ class Graph{
     constructor(){
         this.nodes = new Set()
         this.edges = new Set()
+        this.counter = 0
     }
 
     addNodes(nodes){
@@ -16,6 +17,12 @@ class Graph{
         } else {
             throw "graph hasn't one of this nodes " + e
         }
+    }
+
+    update(){
+        this.counter++
+        console.log(this.counter)
+        console.log(this)
     }
 }
 

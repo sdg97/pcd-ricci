@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/JavaFXSmartGraph-0.9/JavaFXSmartGraph-0.9.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/sdelg/Desktop/pcd-ass2/executors/lib/JavaFXSmartGraph-0.9/doc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_241/jre/lib/jfxswt.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
