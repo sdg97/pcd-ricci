@@ -7,6 +7,6 @@
 			<attribute name="javadoc_location" value="file:/C:/Users/sdelg/Desktop/pcd-ass2/executors/lib/JavaFXSmartGraph-0.9/doc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.8.0_241/jre/lib/jfxswt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sdelg/Desktop/pcd-ass2/executors/lib/jfxswt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
