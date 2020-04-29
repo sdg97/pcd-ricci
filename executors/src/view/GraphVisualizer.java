@@ -34,35 +34,28 @@ public class GraphVisualizer extends Application {
 	
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Master master;
-	
-	private Graph<String, String> createGraph() {
-		Graph<String, String> g = new GraphEdgeList<String, String>();
-
-		g.insertVertex("A");
-		g.insertVertex("B");
-		g.insertEdge("A", "B", "1");
-
-		return g;
-	}
-	
-	public void updateGraph(utilities.Graph g) {
-		Graph<String, String> graph = new GraphEdgeList<String, String>();
-
-		System.out.println("UpdateGraph "+ g.getNodes());
+	private Graph<String, String> g = new GraphEdgeList<String, String>();
+	private SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
+	private SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, strategy);
 		
-		for(String s : g.getNodes()){
-			graph.insertVertex(s);
+	public void updateGraph(utilities.Graph graph) {
+		//Graph<String, String> graph = new GraphEdgeList<String, String>();
+		//RESET GRAPH
+		System.out.println("UpdateGraph "+ graph.getNodes());
+		
+		for(String s : graph.getNodes()){
+			g.insertVertex(s);
 			System.out.println("Insert " + s);
 		}
 		
-		System.out.println("UpdateGraph "+ g.getEdges());
+		System.out.println("UpdateGraph "+ graph.getEdges());
 
-		for(Tuple2<String, String> t : g.getEdges()) {
+		for(Tuple2<String, String> t : graph.getEdges()) {
 			System.out.println("I want to insert edge " + t.getFirst() + " to " + t.getSecond() );
-			System.out.println("Vetex: " + graph.vertices());
-			graph.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
+			System.out.println("Vetex: " + g.vertices());
+			g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
 		}
-		
+		graphView.updateAndWait();
 	}
 	
 	public void update() {
@@ -71,8 +64,6 @@ public class GraphVisualizer extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-		SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(createGraph(), strategy);
 				
 		GridPane root = new GridPane();
         root.setHgap(8);
@@ -129,7 +120,7 @@ public class GraphVisualizer extends Application {
         root.add(labelLev, 6, 0);
         root.add(spinner, 7, 0, 1, 1);
         
-        root.add(graphView, 0, 1, 6, 6);
+        root.add(this.graphView, 0, 1, 6, 6);
         
         root.add(playButton, 7, 7);
         
