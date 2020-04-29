@@ -1,6 +1,7 @@
-package model;
+package main;
 
 
+import model.Master;
 import view.GraphVisualizer;
 
 
