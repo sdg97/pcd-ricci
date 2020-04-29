@@ -1,25 +1,28 @@
 import React from 'react';
 import { TextAreaAddress } from "./TextAreaAddres";
 import { GraphVisualizer } from "./GraphVisualizer";
-const Graph = require('../Model/graph')
 const axios = require('axios').default;
 
 const  myConfig = {
     nodeHighlightBehavior: true,
     node: {
         color: "lightgreen",
-        size: 120,
+        size: 1500,
         highlightStrokeColor: "blue",
     },
     link: {
+        type: "CURVE_SMOOTH",
         highlightColor: "lightblue",
-    }
+    },
+    directed: true,
+    height:  window.innerHeight,
+    width: window.innerWidth
   }
 export class Main extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            nodes : [{id : 'cacca'}],
+            nodes : [],
             edges : [],
             counter : 0
         }
@@ -28,6 +31,8 @@ export class Main extends React.Component {
         this.checkIfIsARealLink = this.checkIfIsARealLink.bind(this)
         this.getPageReference = this.getPageReference.bind(this)
         this.search = this.search.bind(this)
+        this.addEdge = this.addEdge.bind(this)
+        this.addNode = this.addNode.bind(this)
     }
 
     render(){
@@ -40,7 +45,7 @@ export class Main extends React.Component {
     }
 
     createUrlForPageInfo(title){
-        return "https://it.wikipedia.org/w/api.php?action=parse&page="+ title+"&format=json&section=0&prop=links"
+        return "https://cors-anywhere.herokuapp.com/http://it.wikipedia.org/w/api.php?action=parse&page="+ title+"&format=json&section=0&prop=links"
     }
 
     getPageTitleFromUrl(url){
@@ -50,17 +55,19 @@ export class Main extends React.Component {
     }
 
     checkIfIsARealLink(pseudoLink){
-        return pseudoLink['ns'] == 0
+        return pseudoLink['ns'] === 0
     }
 
     async getPageReference(title){
         var config = {
-            headers: {'Access-Control-Allow-Origin': '*'},
-            proxy: {
-                host: '104.236.174.88',
-                port: 3128
+            headers: {
+                'Access-Control-Allow-Origin': 'http://localhost:3000',
+                'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS', 
+                'Access-Control-Allow-Credentials':true,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
             }
-        };
+        }
         let res
         res = await axios.get(this.createUrlForPageInfo(title), config)
 
@@ -73,31 +80,73 @@ export class Main extends React.Component {
         return ref
     }
 
+
+    addNode(node){
+        setTimeout(() => {
+            this.setState({
+    nodes: [ ...this.state.nodes, {id: node}]
+})          
+        }, 1000);
+    }
+
+    addEdge(source, target){
+        setTimeout(() => {
+            this.setState({
+                edges: [ ...this.state.edges, {source: source, target: target}]
+            })
+        }, 1000);
+    }
+
     async search(title, currDepth, maxDepth){
         console.log(title, currDepth, maxDepth)
-        if(currDepth < maxDepth){
-            let res = await this.getPageReference(title)
-            /*if(currDepth == 1) {
-                console.log('Risultati fase 2' , title , res)
-            }*/   
-            //aggiuge i nodi
-            console.log(res)
-            for(let i = 0; i < res.length; i ++){
-                const tempRes = res[i]
-                this.setState({
-                    nodes: [ ...this.state.nodes, {id : tempRes}]
-                })
-                this.setState({
-                    edges: [ ...this.state.edges, {source : title, target : tempRes}]
-                })
-            }            //aggiunge gli archi
-            let newCount = this.state.counter + 1
-            this.setState({counter : newCount})
-            //continua la ricerca a un livello più profondo
-            for(let i = 0; i < res.length; i ++){
-                this.search(res[i], currDepth + 1, maxDepth)
+        if(currDepth === 0){
+            console.log("SETTO PADRE");
+            this.addNode(title)
+          
+        }
+        console.log('Current depth', currDepth)
+
+            if(currDepth < maxDepth){
+                let res = await this.getPageReference(title); 
+                console.log(res)
+                let newCount = this.state.counter + 1
+                this.setState({counter : newCount})
+                for(let i = 0; i < res.length; i ++){
+                    this.addNode(res[i])
+                } 
+                for(let i = 0; i < res.length; i ++){
+                    this.addEdge(title, res[i])
+                }  
+
+                for(let i = 0; i < res.length; i ++){
+                    this.search(res[i], currDepth + 1, maxDepth)
+                }
             }
-        } 
+   
+       
+            //continua la ricerca a un livello più profondo
+        /*
+        setTimeout (() => {
+            for (let index = 0; index < 5; index++) {
+                    this.setState({
+                        nodes: [ ...this.state.nodes, {id : 'i'+index}]
+                    })
+                    this.setState({
+                        edges: [ ...this.state.edges, {source : 'Harry', target : 'i'+index}]
+                    })
+            }
+            for (let i = 1; i < 5; i++) {
+                for (let index = 0; index <2; index++) {
+                    this.setState({
+                        nodes: [ ...this.state.nodes, {id : 'index'+index}]
+                    })
+                    this.setState({
+                        edges: [ ...this.state.edges, {source : 'i'+i, target : 'index'+index}]
+                    })
+                }
+            }
+        }, 2000);
+        */
     }
 
     
