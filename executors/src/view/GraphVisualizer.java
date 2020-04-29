@@ -18,6 +18,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import soph.Tuple2;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -27,9 +28,10 @@ import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrateg
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 
-public class GraphVisualizer extends Application{
+public class GraphVisualizer extends Application {
 	
-	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	
 	
 	private Graph<String, String> createGraph() {
 		Graph<String, String> g = new GraphEdgeList<String, String>();
@@ -71,26 +73,12 @@ public class GraphVisualizer extends Application{
 	public static void update() {
 		System.out.println("CIAO");
 	}
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
 		SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(createGraph(), strategy);
-		
-		
-//		GridPane grid = new GridPane();
-//		grid.setAlignment(Pos.TOP_CENTER);
-//
-//				
-//		Label address = new Label("Add Link:");
-//		grid.add(address, 0, 1);
-//
-//		TextField userTextField = new TextField();
-//		grid.add(userTextField, 1, 1);
-//
-//		grid.add(graphView, 1, 100);
-		
-		
-		
+				
 		GridPane root = new GridPane();
         root.setHgap(8);
         root.setVgap(8);
@@ -127,6 +115,10 @@ public class GraphVisualizer extends Application{
         	
             @Override public void handle(ActionEvent e) {
                 System.out.println("Press Play");
+                String link = field.getText();
+                int level = spinner.getValue();
+                Tuple2 t = new Tuple2(link, level);
+                System.out.println(t);
                 //TODO
             }
         });
@@ -155,8 +147,7 @@ public class GraphVisualizer extends Application{
       });
         
         graphView.init();
-		
-		
+        
 	}
 
 }
