@@ -18,10 +18,12 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import soph.Tuple2;
+import model.Master;
+import utilities.Tuple2;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.concurrent.ExecutionException;
 
 import com.brunomnsilva.smartgraph.graph.*;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
@@ -31,7 +33,7 @@ import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 public class GraphVisualizer extends Application {
 	
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	
+	private static Master master;
 	
 	private Graph<String, String> createGraph() {
 		Graph<String, String> g = new GraphEdgeList<String, String>();
@@ -70,7 +72,7 @@ public class GraphVisualizer extends Application {
 		return g;
 	}
 	
-	public static void update() {
+	public void update() {
 		System.out.println("CIAO");
 	}
 	
@@ -117,9 +119,15 @@ public class GraphVisualizer extends Application {
                 System.out.println("Press Play");
                 String link = field.getText();
                 int level = spinner.getValue();
-                Tuple2 t = new Tuple2(link, level);
-                System.out.println(t);
-                //TODO
+                Tuple2<String, Integer> t = new Tuple2<>(link, 0);
+                try {
+                	if(master != null)
+                		master.compute(t, level);
+                } catch (InterruptedException e1) {
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					e1.printStackTrace();
+				}
             }
         });
         
@@ -131,7 +139,6 @@ public class GraphVisualizer extends Application {
         root.add(graphView, 0, 1, 6, 6);
         
         root.add(playButton, 7, 7);
-        
         
         Scene scene = new Scene(root, screenSize.getWidth()*0.7, screenSize.getWidth()*0.4);
   
@@ -147,9 +154,16 @@ public class GraphVisualizer extends Application {
       });
         
         graphView.init();
-        
 	}
-
+	
+	public void setMaster(Master m) {
+		master = m;
+		System.out.println("Master: " + master);
+	}
+	
+	public void play(String[] args) {
+		launch(args);
+	}
 }
 
 
