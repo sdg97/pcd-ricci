@@ -3,33 +3,36 @@ package soph;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+
+import com.brunomnsilva.smartgraph.graph.Graph;
+import com.brunomnsilva.smartgraph.graph.GraphEdgeList;
 
 public class Master {
 
-	//private int numTasks;
 	private ExecutorService executor;
 	private Result result;
-	private String address;
+	private int c = 0;
+	private Graph<String, String> graph;
 
-	public Master (String address, int poolSize){		
-		//this.numTasks = numTasks;
+	public Master (Tuple2 tuple, int poolSize){		
 		executor = Executors.newFixedThreadPool(poolSize);
 		this.result = new Result(10);
-		this.address = address;
+		this.result.add(tuple);
+		this.graph = new GraphEdgeList<String, String>();
 	}
 
 	public void compute() throws InterruptedException {
-		for (int i = 0; i < 10; i++) {
 		
-		//while() {
+		while(c < 100 /*true*/) {
 			try {
-				executor.execute(new Tasks(result, "Thread "));
+				executor.execute(new Tasks(result, c));
 				log("MASTER PRINT");
+				c++;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Num of nodes is " + c);
 	}
 
 	public ArrayList<Tuple2> getRes() throws InterruptedException{

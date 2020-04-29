@@ -22,6 +22,10 @@ public class Result {
 			notifyAll();
 		}
 	}
+	
+	public synchronized Tuple2 getFirst() {
+		return this.list.size() > 0 ? this.list.remove(0) : null;
+	}
 
 	public synchronized ArrayList<Tuple2> getResult() throws InterruptedException {
 		while (nResultsArrived < nTotalResultsToWait){
