@@ -10,17 +10,20 @@ import java.util.concurrent.Future;
 
 import utilities.Graph;
 import utilities.Tuple2;
+import view.GraphVisualizer;
 
 public class Master extends Thread {
 
 	private ExecutorService executor;
 	private int depthLevel;
 	private Graph graph;
+	private GraphVisualizer gv;
 
-	public Master (int poolSize){		
+	public Master (int poolSize, GraphVisualizer gv) {	
 		this.executor = Executors.newFixedThreadPool(poolSize);
 		this.depthLevel = 1;
 		this.graph = new Graph();
+		this.gv = gv;
 	}
 
 	public int compute(Tuple2<String, Integer> initTuple, int dl) throws InterruptedException, ExecutionException { 
@@ -37,7 +40,8 @@ public class Master extends Thread {
 		Tuple2<String, ArrayList<Tuple2<String, Integer>>> t;
 		
 		tuples.add(initTuple);
-		
+		graph.addNodes(tuples);
+
 		while(this.depthLevel > 0) {
 			log("Depth level is " + this.depthLevel);
 			for(int i = 0; i < tuples.size(); i++) {
@@ -48,14 +52,21 @@ public class Master extends Thread {
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
 				tmp.addAll(t.getSecond());
-				for(Tuple2<String, Integer> n : f.get().getSecond())
+				for(Tuple2<String, Integer> n : t.getSecond()) {
+					System.out.println("t First " + t.getFirst() + " n First " + n.getFirst());
 					graph.addEdge(new Tuple2<String, String>(t.getFirst(), n.getFirst()));
+				}
 			}
 			tuples = tmp;
 			graph.addNodes(tuples);
 			this.depthLevel--;
+			if(gv == null)
+				System.out.println("GRaph NULL");
+			else 
+				gv.updateGraph(graph);
 		}
-	
+
+		
 		//System.out.println("Number of elem in resultSet" + result.size());
 		executor.shutdown();
 		return 0;

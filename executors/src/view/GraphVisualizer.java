@@ -40,36 +40,29 @@ public class GraphVisualizer extends Application {
 
 		g.insertVertex("A");
 		g.insertVertex("B");
-		g.insertVertex("C");
-		g.insertVertex("D");
-		g.insertVertex("E");
-		g.insertVertex("F");
-		g.insertVertex("G");
-
 		g.insertEdge("A", "B", "1");
-		g.insertEdge("A", "C", "2");
-		g.insertEdge("A", "D", "3");
-		g.insertEdge("A", "E", "4");
-		g.insertEdge("A", "F", "5");
-		g.insertEdge("A", "G", "6");
 
-		g.insertVertex("H");
-		g.insertVertex("I");
-		g.insertVertex("J");
-		g.insertVertex("K");
-		g.insertVertex("L");
-		g.insertVertex("M");
-		g.insertVertex("N");
-
-		g.insertEdge("H", "I", "7");
-		g.insertEdge("H", "J", "8");
-		g.insertEdge("H", "K", "9");
-		g.insertEdge("H", "L", "10");
-		g.insertEdge("H", "M", "11");
-		g.insertEdge("H", "N", "12");
-
-		g.insertEdge("A", "H", "0");
 		return g;
+	}
+	
+	public void updateGraph(utilities.Graph g) {
+		Graph<String, String> graph = new GraphEdgeList<String, String>();
+
+		System.out.println("UpdateGraph "+ g.getNodes());
+		
+		for(String s : g.getNodes()){
+			graph.insertVertex(s);
+			System.out.println("Insert " + s);
+		}
+		
+		System.out.println("UpdateGraph "+ g.getEdges());
+
+		for(Tuple2<String, String> t : g.getEdges()) {
+			System.out.println("I want to insert edge " + t.getFirst() + " to " + t.getSecond() );
+			System.out.println("Vetex: " + graph.vertices());
+			graph.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
+		}
+		
 	}
 	
 	public void update() {
