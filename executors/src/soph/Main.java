@@ -9,11 +9,8 @@ public class Main {
 
 		int poolSize = Runtime.getRuntime().availableProcessors() + 1 ;
 
-		Master master = new Master(new Tuple2("Macchina", 0), poolSize);
-		master.compute();
-
-		ArrayList<Tuple2> result = master.getRes();
-		System.out.println("Result: "+result);
+		Master master = new Master(poolSize);
+		int numNodes = master.compute(null);
 
 		System.exit(0);
 	}

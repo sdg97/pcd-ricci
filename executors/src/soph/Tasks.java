@@ -1,48 +1,32 @@
 package soph;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.concurrent.Callable;
 
 /**
  * Dato un link prende i link correlati
  */
-public class Tasks implements Runnable {
+public class Tasks implements Callable<ArrayList<Tuple2>> {
 
-	private Result result;
-	private int id;
-	private ArrayList<String> nodes;
+	private Tuple2 myTuple;
+	private ArrayList<Tuple2> nodes;
 	
-	public Tasks(Result result, int id) {
-		this.result = result;
-		this.id = id;
+	public Tasks(Tuple2 t) {
+		this.myTuple = t;
 		this.nodes = new ArrayList<>();
 	}
-	
-	@Override
-	public void run() {
-		//TODO ricerca 
-		this.nodes.add("Ciao");
-		
-		log("I'm "+ id + " execute");
-		//Tuple2 myTuple = result.getTuple(this.id);
-//	    try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		if(myTuple.getLevel() < 10)
-		//	result.add(new Tuple2("fluido", myTuple.getLevel()+1));
-		int rand = new Random().nextInt(10);
-		Tuple2 t = result.getFirst();
-		if(t != null && t.getLevel() < 2)
-			for(int i = 0; i < rand; i++ )
-				result.add(new Tuple2("ciao", t.getLevel()+1));
 
+	@Override
+	public ArrayList<Tuple2> call() throws Exception {
+		for(int i = 0; i < 3; i++)
+			this.nodes.add(new Tuple2("ciao", myTuple.getLevel()+1));
+		log("#nodes = " + this.nodes.size());
+		return this.nodes;
 	}
 	
 	private void log(String msg) {
-		System.out.println(msg);
+		System.out.println("[TASK]" + msg);
 	}
+
 
 }
