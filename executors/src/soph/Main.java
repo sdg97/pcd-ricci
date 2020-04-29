@@ -10,9 +10,6 @@ public class Main {
 		int poolSize = Runtime.getRuntime().availableProcessors() + 1 ;
 
 		Master master = new Master("CIAO", poolSize);
-		@SuppressWarnings("unused")
-		Viewer viewer = new Viewer(1000, 500, master);
-
 		System.out.println("GO Viewer");
 		Thread.sleep(5000);
 

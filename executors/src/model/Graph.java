@@ -8,8 +8,6 @@ public class Graph {
 	
 	public static void main(String args[]) {
 		
-		
-		
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
 			

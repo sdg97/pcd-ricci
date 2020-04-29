@@ -1,25 +1,25 @@
 package soph;
 
 public class Tuple2 {
-	private String name;
 	private String link;
+	private int level;
 	
-	public Tuple2(String name, String link) {
-		this.name = name;
+	public Tuple2(String link, int level) {
 		this.link = link;
+		this.level = level;
 	}
 
-	public String getName() {
-		return name;
+	public int getLevel() {
+		return this.level;
 	}
 
 	public String getLink() {
-		return link;
+		return this.link;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + name + "," + link + ")";
+		return "(" + link + "," + level + ")";
 	}
 
 }

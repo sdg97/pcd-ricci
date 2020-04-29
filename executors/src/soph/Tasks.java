@@ -22,8 +22,7 @@ public class Tasks implements Runnable {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		result.add(new Tuple2(myName, "1) https:\\"));	
-		result.add(new Tuple2(myName, "2) https:\\"));	
+
 	}
 	
 	private void log(String msg) {
