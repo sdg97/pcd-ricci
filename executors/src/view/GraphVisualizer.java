@@ -1,6 +1,7 @@
 package view;
 
 import javafx.application.Application;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,48 +24,72 @@ import utilities.Tuple2;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.brunomnsilva.smartgraph.graph.*;
+import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
+import com.brunomnsilva.smartgraph.graphview.SmartGraphProperties;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 
 public class GraphVisualizer extends Application {
 	
+	private volatile boolean updateCheck = false;
+	private final SmartGraphProperties a = new SmartGraphProperties();
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Master master;
-	private Graph<String, String> g = new GraphEdgeList<String, String>();
-	private SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-	private SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, strategy);
-		
+	private Set<String> nodes = new HashSet<String>();
+	private Set<Tuple2<String, String>> edges = new HashSet();
+	private static Graph<String, String> g = new GraphEdgeList<String, String>();
+	private static SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
+	private final static SmartGraphPanel<String, String> graphView =  new SmartGraphPanel<>(g, strategy);;
 	public void updateGraph(utilities.Graph graph) {
 		//Graph<String, String> graph = new GraphEdgeList<String, String>();
 		//RESET GRAPH
+		updateCheck = true;
 		System.out.println("UpdateGraph "+ graph.getNodes());
 		
 		for(String s : graph.getNodes()){
-			g.insertVertex(s);
-			System.out.println("Insert " + s);
+			if(!nodes.contains(s)) {
+				nodes.add(s);
+				g.insertVertex(s);				
+			}
+			//System.out.println("Insert " + s);
 		}
 		
-		System.out.println("UpdateGraph "+ graph.getEdges());
 
 		for(Tuple2<String, String> t : graph.getEdges()) {
-			System.out.println("I want to insert edge " + t.getFirst() + " to " + t.getSecond() );
-			System.out.println("Vetex: " + g.vertices());
-			g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
+			System.out.println(t + "" +!edges.stream().anyMatch(i -> i.getFirst().equals(t.getFirst()) && i.getSecond().equals(t.getSecond())));
+
+			if(!edges.stream().anyMatch(i -> i.getFirst().equals(t.getFirst()) && i.getSecond().equals(t.getSecond()))) {
+				g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
+				edges.add(t);
+			}
+			//System.out.println("I want to insert edge " + t.getFirst() + " to " + t.getSecond() );
+			//System.out.println("Vetex: " + g.vertices());
 		}
-		graphView.updateAndWait();
+		graphView.update();
+
 	}
 	
 	public void update() {
-		System.out.println("CIAO");
+		if(updateCheck) {
+			graphView.applyCss();
+			updateCheck = false;
+		}
+
 	}
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-				
+		
 		GridPane root = new GridPane();
         root.setHgap(8);
         root.setVgap(8);
@@ -119,13 +144,16 @@ public class GraphVisualizer extends Application {
         root.add(field, 1, 0, 5, 1);
         root.add(labelLev, 6, 0);
         root.add(spinner, 7, 0, 1, 1);
-        
-        root.add(this.graphView, 0, 1, 6, 6);
-        
+        root.add(graphView, 0, 1, 6, 6);
+        System.out.println(graphView.getScene());
+
         root.add(playButton, 7, 7);
-        
         Scene scene = new Scene(root, screenSize.getWidth()*0.7, screenSize.getWidth()*0.4);
-  
+        System.out.println(graphView.getScene());
+        graphView.automaticLayoutProperty();
+        graphView.setAutomaticLayout(true);
+        scene.getStylesheets().add(getClass().getResource( File.separator + "smartgraph.css").toExternalForm());
+
         primaryStage.setTitle("WikiRef");
         primaryStage.setScene(scene);
         primaryStage.show();

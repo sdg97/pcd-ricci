@@ -84,8 +84,8 @@ export class Main extends React.Component {
     addNode(node){
         setTimeout(() => {
             this.setState({
-    nodes: [ ...this.state.nodes, {id: node}]
-})          
+                nodes: [ ...this.state.nodes, {id: node}]
+            })          
         }, 1000);
     }
 
@@ -113,11 +113,8 @@ export class Main extends React.Component {
                 this.setState({counter : newCount})
                 for(let i = 0; i < res.length; i ++){
                     this.addNode(res[i])
-                } 
-                for(let i = 0; i < res.length; i ++){
                     this.addEdge(title, res[i])
-                }  
-
+                } 
                 for(let i = 0; i < res.length; i ++){
                     this.search(res[i], currDepth + 1, maxDepth)
                 }

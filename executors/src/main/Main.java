@@ -15,18 +15,20 @@ public class Main {
 		GraphVisualizer graphView = new GraphVisualizer();
 		Master master = new Master(poolSize, graphView);
 		graphView.setMaster(master);
-
-		graphView.play(args);
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
 			
 			while(true) {
-				if(System.currentTimeMillis() - time == 5000) {
+
+				if(System.currentTimeMillis() - time == 200) {
+					//System.out.println("update view");
 					graphView.update(); 
 					time = System.currentTimeMillis();
 				}
 			}
 		}).start();
+
+		graphView.play(args);
 				
 	}
 

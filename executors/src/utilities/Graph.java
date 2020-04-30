@@ -38,5 +38,10 @@ public class Graph {
 	public Set<Tuple2<String, String>> getEdges(){
 		return this.edges;
 	}
+	
+	public void resetGraph() {
+		this.nodes = new HashSet<>();
+		this.edges = new HashSet<>();	
+	}
 
 }

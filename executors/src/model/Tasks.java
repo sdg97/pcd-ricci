@@ -32,7 +32,7 @@ public class Tasks implements Callable<Tuple2<String, ArrayList<Tuple2<String, I
 
 	@Override
 	public Tuple2<String, ArrayList<Tuple2<String, Integer>>> call() throws Exception {
-		String url = GET_URL_INIT + myTuple.getFirst() + GET_URL_END;
+		String url = GET_URL_INIT + myTuple.getFirst().replaceAll(" ", "_") + GET_URL_END;
 		URL obj2 = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) obj2.openConnection();
 		conn.setRequestMethod("GET");
@@ -50,18 +50,27 @@ public class Tasks implements Callable<Tuple2<String, ArrayList<Tuple2<String, I
 		//print in String
 		//System.out.println(response.toString());
 		//Read JSON response and print
-		JSONObject myResponse = new JSONObject(response.toString());
-		JSONArray job = (JSONArray)((JSONObject) myResponse.get("parse")).get("links");
-		for(int i = 0; i < job.length(); i++) {
-			this.nodes.add(new Tuple2<String, Integer>(job.getJSONObject(i).get("*").toString(), myTuple.getSecond()+1));
-			log(job.getJSONObject(i).get("*").toString());
+		JSONObject myResponse;
+		JSONArray job;
+		try {
+			myResponse = new JSONObject(response.toString());	
+			job = (JSONArray)((JSONObject) myResponse.get("parse")).get("links");
+			for(int i = 0; i < job.length(); i++) {
+				if(job.getJSONObject(i).get("ns").toString().equals("0") ) {
+					this.nodes.add(new Tuple2<String, Integer>(job.getJSONObject(i).get("*").toString(), myTuple.getSecond()+1));
+					log(job.getJSONObject(i).get("*").toString());				
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(url);			
 		}
-		System.out.println("My Tuple first is " +this.myTuple.getFirst() );
+		
+		//System.out.println("My Tuple first is " +this.myTuple.getFirst() );
 		return new Tuple2<String, ArrayList<Tuple2<String, Integer>>>(this.myTuple.getFirst(), this.nodes);
 	}
 
 	private void log(String msg) {
-		System.out.println("[TASK]" + msg);
+		//System.out.println("[TASK]" + msg);
 	}
 
 
