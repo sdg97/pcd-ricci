@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import { Main } from "./Components/Main";
+import {AsyncMain} from "./Components/AsyncMain";
 
 
 function App() {
   return (
     <div className="App" >
-      <Main></Main>
+      <AsyncMain></AsyncMain>
     </div>
   );
 }

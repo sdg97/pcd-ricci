@@ -1,37 +1,66 @@
 import React from 'react';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
 export class TextAreaAddress extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {value: '', depth : 0};
-        this.handleValueChange = this.handleValueChange.bind(this);
-        this.handleDepthChange = this.handleDepthChange.bind(this)
-      }
-    
-      handleValueChange(event) {
-        this.setState({value: event.target.value});
-      }
+  constructor(props) {
+    super(props);
+    this.state = { value: '', depth: 0, mode: 'async' };
+    this.handleValueChange = this.handleValueChange.bind(this);
+    this.handleDepthChange = this.handleDepthChange.bind(this)
+    this.handleModeChange = this.handleModeChange.bind(this)
+  }
 
-      handleDepthChange(event) {
-        this.setState({depth: event.target.value});
-      }
-    
+  handleValueChange(event) {
+    this.setState({ value: event.target.value });
+  }
 
-    
-      render() {
-        return (
-            <div>
-                    <label>
-                      Address:
-                      <input type="text" value={this.state.value} onChange={this.handleValueChange} />
-                    </label>
-                    <label>
-                      Depth:
-                      <input size="3" type="number"  onChange={this.handleDepthChange} />
-                    </label>
-                    <button type="submit" onClick={e => this.props.handleSubmit(this.state.value, 0, this.state.depth)}>Play</button>
+  handleDepthChange(event) {
+    this.setState({ depth: event.target.value });
+  }
 
-            </div>
-         
-        )
-      }
+  handleModeChange(event) {
+    this.setState({ mode: event.target.value })
+  }
+
+
+
+  render() {
+    return (
+      <div>
+        <label>
+          Address:
+            <input type="text" value={this.state.value} onChange={this.handleValueChange} />
+        </label>
+        <label>
+          Depth:
+            <input size="3" type="number" onChange={this.handleDepthChange} />
+        </label>
+        <FormControl variant="filled">
+        <InputLabel htmlFor="filled-age-native-simple">Mode</InputLabel>
+        <Select
+          native
+          onChange={this.handleModeChange}
+          inputProps={{
+            name: 'age',
+            id: 'filled-age-native-simple',
+          }}
+        >
+          <option aria-label="None" value="" />
+          <option value={'async'}>Async</option>
+          <option value={'reactive'}>Reactve</option>
+        </Select>
+      </FormControl>
+        <button type="submit" onClick={e => {
+          if(this.state.mode == 'async'){
+            this.props.handleSubmitAsync(this.state.value, 0, this.state.depth)
+          } else {
+            this.props.handleSubmitReactive(this.state.value, 0, this.state.depth)
+          }
+        }}>Play</button>
+      </div>
+
+    )
+  }
 }
