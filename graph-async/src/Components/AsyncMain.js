@@ -28,7 +28,6 @@ export class AsyncMain extends React.Component {
             counter: 0
         }
         this.createUrlForPageInfo = this.createUrlForPageInfo.bind(this)
-        this.getPageTitleFromUrl = this.getPageTitleFromUrl.bind(this)
         this.checkIfIsARealLink = this.checkIfIsARealLink.bind(this)
         this.asyncGetPageReference = this.asyncGetPageReference.bind(this)
         this.asyncSearch = this.asyncSearch.bind(this)
@@ -46,16 +45,12 @@ export class AsyncMain extends React.Component {
         )
     }
 
+
     createUrlForPageInfo(title) {
         //https://cors-anywhere.herokuapp.com/
         return "https://it.wikipedia.org/w/api.php?action=parse&page=" + title + "&format=json&section=0&prop=links"
     }
 
-    getPageTitleFromUrl(url) {
-        url.trim()
-        let urlArray = url.split('/')
-        return urlArray[urlArray.length - 1]
-    }
 
     checkIfIsARealLink(pseudoLink) {
         return pseudoLink['ns'] === 0
@@ -84,11 +79,18 @@ export class AsyncMain extends React.Component {
 
 
     addNode(node) {
-        setTimeout(() => {
-            this.setState({
-                nodes: [...this.state.nodes, { id: node }]
-            })
-        }, 1000);
+        if (this.check(node)) {
+            setTimeout(() => {
+
+                this.setState({
+                    nodes: [...this.state.nodes, { id: node }]
+                })
+            }, 1000);
+        }
+    }
+
+    check(node) {
+        return !this.state.nodes.includes({ id: node })
     }
 
     addEdge(source, target) {
