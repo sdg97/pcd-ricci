@@ -66,13 +66,18 @@ export class AsyncMain extends React.Component {
                 'Content-Type': 'application/json',
             }
         }
-        let res = await axios.get(this.createUrlForPageInfo(title), config)
-
         let ref = []
-        let link = res.data.parse.links
-        for (let i = 0; i < link.length; i++) {
-            if (this.checkIfIsARealLink(link[i]))
-                ref.push(link[i]['*'])
+
+        try {     
+            let res = await axios.get(this.createUrlForPageInfo(title), config)
+    
+            let link = res.data.parse.links
+            for (let i = 0; i < link.length; i++) {
+                if (this.checkIfIsARealLink(link[i]))
+                    ref.push(link[i]['*'])
+            }
+        } catch (error) {
+            console.log('CANNOT GET THE REQUESTED PAGE')
         }
         return ref
     }
@@ -137,8 +142,8 @@ export class AsyncMain extends React.Component {
             }
         }
         return defer(async () => {
-            let res = await axios.get(this.createUrlForPageInfo(title), config)
             let ref = []
+            let res = await axios.get(this.createUrlForPageInfo(title), config)
             let link = res.data.parse.links
             for (let i = 0; i < link.length; i++) {
                 if (this.checkIfIsARealLink(link[i]))
@@ -167,6 +172,8 @@ export class AsyncMain extends React.Component {
 
                 }
 
+            }, (err) => {
+                console.log('CANNOT GET THE REQUESTED PAGE')
             })
         }
     }
