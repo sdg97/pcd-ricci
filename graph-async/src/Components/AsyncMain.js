@@ -8,12 +8,14 @@ const myConfig = {
     nodeHighlightBehavior: true,
     node: {
         color: "lightgreen",
-        size: 1500,
+        size: 900,
         highlightStrokeColor: "blue",
     },
     link: {
         type: "CURVE_SMOOTH",
         highlightColor: "lightblue",
+        markerHeight: 20,
+        markerWidth: 10
     },
     directed: true,
     height: window.innerHeight,
