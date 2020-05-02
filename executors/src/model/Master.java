@@ -38,7 +38,7 @@ public class Master extends Thread {
 		ArrayList<Tuple2<String, Integer>> tmp = new ArrayList<>();
 		Tuple2<String, ArrayList<Tuple2<String, Integer>>> t;
 		
-		tuples.add(new Tuple2<String, Integer>(initTuple.getFirst().toLowerCase(), initTuple.getSecond()));
+		tuples.add(new Tuple2<String, Integer>(initTuple.getFirst(), initTuple.getSecond()));
 		graph.addNodes(tuples);
 
 		while(this.depthLevel > 0) {
@@ -51,12 +51,12 @@ public class Master extends Thread {
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
 				for (Tuple2<String, Integer> tuple2 : t.getSecond()) {
-					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst().toLowerCase(), tuple2.getSecond()));
+					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond()));
 				}
 				
 				for(Tuple2<String, Integer> n : t.getSecond()) {
 					//System.out.println("t First " + t.getFirst() + " n First " + n.getFirst());
-					graph.addEdge(new Tuple2<String, String>(n.getFirst().toLowerCase(), t.getFirst().toLowerCase()));
+					graph.addEdge(new Tuple2<String, String>(n.getFirst(), t.getFirst()));
 				}
 			}
 			tuples = tmp;

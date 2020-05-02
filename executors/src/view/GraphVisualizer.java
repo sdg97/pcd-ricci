@@ -26,73 +26,80 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.brunomnsilva.smartgraph.graph.*;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
+import com.brunomnsilva.smartgraph.graphview.SmartGraphProperties;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
+import com.sun.javafx.geom.Edge;
+import com.sun.org.apache.xerces.internal.dom.DeepNodeListImpl;
 
 public class GraphVisualizer extends Application {
 
-	private static volatile boolean updateCheck = false;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Master master;
-	private Set<String> nodes = new HashSet<String>();
-	private Set<Tuple2<String, String>> edges = new HashSet();
-	private List<String> nodesToAdd = new ArrayList();
-	private List<Tuple2<String, String>> edgesToAdd = new ArrayList();
+	//private static SmartGraphProperties properties = new SmartGraphProperties();
+	private List<String> edges = new ArrayList<String>();
+	private List<Tuple2<String, String>> edgesToAdd = new ArrayList<Tuple2<String, String>>();
 	private static Graph<String, String> g = new GraphEdgeList<String, String>();
 	private static SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
 	private final static SmartGraphPanel<String, String> graphView =  new SmartGraphPanel<>(g, strategy);
 	
+	private int nodeCount = 0;
+	//private boolean resized = false;
 	private static Label labelNum;
 	private static int depthLevel = 0;
 	private static String link = null;
 
 	public void updateGraph(utilities.Graph graph) {
-		updateCheck = true;
-		System.out.println("UpdateGraph "+ graph.getNodes());
-		for(String s : graph.getNodes()){
-			if(!nodes.contains(s)) {
-				nodes.add(s);
-				nodesToAdd.add(s);
-				//g.insertVertex(s);				
-			}
-		}
-
 		for(Tuple2<String, String> t : graph.getEdges()) {
-			if(!edges.stream().anyMatch(i -> i.getFirst().equals(t.getFirst()) && i.getSecond().equals(t.getSecond()))) {
-				//g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
-				edges.add(t);
+			if(!edges.contains(t.getSecond() + t.getFirst())) {
+				edges.add(t.getSecond() + t.getFirst());
 				edgesToAdd.add(t);
 			}
 		}
-		int total = Integer.parseInt(labelNum.getText())+nodes.size();
-		labelNum.setText("" + total);
-		graphView.update();
-		
-		
 	}
 
-	public void update() {
-		if(updateCheck && edgesToAdd.size() != 0) {
-			System.out.println("ADD VERTEX "  + nodesToAdd.get(0));
-			//g.insertVertex(nodesToAdd.get(0));
-			//nodesToAdd.remove(0);
+	public void update() throws FileNotFoundException {
+		/*if(nodeCount > 3 && resized == false) {
+			resized = true;
+			System.out.println(graphView.getProperties());
+			//System.out.println(File.separator + "smartgraph2.properties");
+			System.out.println(properties.getVertexRadius());
+			File newFile = new File(System.getProperty("user.dir") + File.separator + "smargraph2.properties");
+			properties = new SmartGraphProperties(new FileInputStream(newFile));
+			System.out.println(properties.getVertexRadius());
+		}*/
+
+		if(edgesToAdd.size() != 0) {
 			Tuple2<String, String> edge = edgesToAdd.get(0);
 			Set<String> vertices = g.vertices().stream().map(v -> v.element()).collect(Collectors.toSet());
-			if(!vertices.contains(edge.getFirst())) g.insertVertex(edge.getFirst());
-			if(!vertices.contains(edge.getSecond())) g.insertVertex(edge.getSecond());
+			if(!vertices.contains(edge.getFirst())) {
+				System.out.println("ADD VERTEX "  + edge.getFirst());
+				g.insertVertex(edge.getFirst());
+				nodeCount++;
+			}
+			if(!vertices.contains(edge.getSecond())) {
+				System.out.println("ADD VERTEX "  + edge.getSecond());
+				g.insertVertex(edge.getSecond());
+				nodeCount++;
+			}
 			System.out.println("ADD EDGE ("  + edge.getFirst() + ", " + edge.getSecond() + ")");
 			g.insertEdge(edge.getSecond(), edge.getFirst(),  edge.getSecond()+edge.getFirst());
 			edgesToAdd.remove(0);
 			graphView.update();
+			System.out.println(nodeCount);
+			Platform.runLater(() -> labelNum.setText("" + nodeCount)) ;
+
 		}
 	}
 
@@ -137,7 +144,7 @@ public class GraphVisualizer extends Application {
 				link = field.getText();
 				depthLevel = spinner.getValue();
 				try {
-					refresh();
+					master.compute(new Tuple2<String, Integer>(link, 1), depthLevel);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				} catch (ExecutionException e1) {
@@ -175,17 +182,26 @@ public class GraphVisualizer extends Application {
 				System.exit(0);
 			}
 		});
+
 		graphView.init();
 	}
 	
-	public void refresh() throws InterruptedException, ExecutionException {
+	public void refresh() throws InterruptedException, ExecutionException, FileNotFoundException {
 		if(link == null || depthLevel == 0) {
 			System.out.println("Not yet initialized");
 			return;
 		}
 		Tuple2<String, Integer> t = new Tuple2<>(link, 1);
-		if(master != null)
+		if(master != null) {
+			Vertex<String> v1 = g.vertices().stream().collect(Collectors.toList()).get(0);
+			Vertex<String> v2 = g.vertices().stream().collect(Collectors.toList()).get(1);			System.out.println("" + v1.element() + v2.element());
+			String edgeToRemove = (v2.element() + v1.element());
+			System.out.println(edges.contains(v2.element() + v1.element()));
+			edges.remove(edgeToRemove);
+			graphView.update();
 			master.compute(t, depthLevel);
+	
+		}
 	}
 
 
