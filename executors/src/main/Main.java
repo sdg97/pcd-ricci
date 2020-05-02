@@ -1,6 +1,8 @@
 package main;
 
 
+import java.util.concurrent.ExecutionException;
+
 import model.Master;
 import view.GraphVisualizer;
 
@@ -17,12 +19,17 @@ public class Main {
 		graphView.setMaster(master);
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
-			
 			while(true) {
 
 				if(System.currentTimeMillis() - time == 1000) {
 					System.out.println("update view");
 					graphView.update(); 
+//					try {
+//						//graphView.refresh();
+//					} catch (InterruptedException | ExecutionException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
 					time = System.currentTimeMillis();
 				}
 			}
