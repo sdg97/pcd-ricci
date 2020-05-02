@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.Callable;
 
 import org.json.JSONArray;
@@ -36,36 +35,33 @@ public class Tasks implements Callable<Tuple2<String, ArrayList<Tuple2<String, I
 		URL obj2 = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) obj2.openConnection();
 		conn.setRequestMethod("GET");
-//		int responseC = conn.getResponseCode();
-//		System.out.println("\nSending 'GET' request to URL : " + url);
-//		System.out.println("Response Code : " + responseC);
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(conn.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		//print in String
-		//System.out.println(response.toString());
-		//Read JSON response and print
-		JSONObject myResponse;
-		JSONArray job;
-		try {
-			myResponse = new JSONObject(response.toString());	
-			job = (JSONArray)((JSONObject) myResponse.get("parse")).get("links");
-			for(int i = 0; i < job.length(); i++) {
-				if(job.getJSONObject(i).get("ns").toString().equals("0") ) {
-					this.nodes.add(new Tuple2<String, Integer>(job.getJSONObject(i).get("*").toString(), myTuple.getSecond()+1));
-					log(job.getJSONObject(i).get("*").toString());				
-				}
+
+		if(conn.getResponseCode() == 200) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
 			}
-		} catch (Exception e) {
-			System.out.println(url);			
+			in.close();
+			JSONObject myResponse;
+			JSONArray job;
+			try {
+				myResponse = new JSONObject(response.toString());	
+				job = (JSONArray)((JSONObject) myResponse.get("parse")).get("links");
+				for(int i = 0; i < job.length(); i++) {
+					if(job.getJSONObject(i).get("ns").toString().equals("0") ) {
+						this.nodes.add(new Tuple2<String, Integer>(job.getJSONObject(i).get("*").toString(), myTuple.getSecond()+1));
+						//log(job.getJSONObject(i).get("*").toString());				
+					}
+				}
+			} catch (Exception e) {
+				//System.out.println(url);			
+			}
+		} else {
+			log("Some error");
 		}
-		
-		//System.out.println("My Tuple first is " +this.myTuple.getFirst() );
+
 		return new Tuple2<String, ArrayList<Tuple2<String, Integer>>>(this.myTuple.getFirst(), this.nodes);
 	}
 

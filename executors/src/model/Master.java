@@ -29,12 +29,11 @@ public class Master extends Thread {
 	public int compute(Tuple2<String, Integer> initTuple, int dl) throws InterruptedException, ExecutionException { 
 		
 		if (initTuple == null)
-			initTuple = new Tuple2<String, Integer>("Macchina", 0);
+			initTuple = new Tuple2<String, Integer>("Macchina", 1);
 		
 		this.depthLevel = dl;
 
 	    Set<Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>>> resultSet = new HashSet<>();
-
 		ArrayList<Tuple2<String, Integer>> tuples = new ArrayList<>();
 		ArrayList<Tuple2<String, Integer>> tmp = new ArrayList<>();
 		Tuple2<String, ArrayList<Tuple2<String, Integer>>> t;
@@ -47,7 +46,7 @@ public class Master extends Thread {
 			for(int i = 0; i < tuples.size(); i++) {
 				Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> res = executor.submit(new Tasks(tuples.get(i)));
 				resultSet.add(res);
-				log(i + "******");
+				//log(i + "******");
 			}
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
@@ -64,13 +63,10 @@ public class Master extends Thread {
 			graph.addNodes(tuples);
 			this.depthLevel--;
 			resultSet = new HashSet<>();
-			if(gv == null)
-				System.out.println("GRaph NULL");
-			else 
+			if(gv != null) 
 				gv.updateGraph(graph);
 		}
 
-		
 		//System.out.println("Number of elem in resultSet" + result.size());
 		executor.shutdown();
 		return 0;
