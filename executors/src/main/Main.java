@@ -20,8 +20,8 @@ public class Main {
 			
 			while(true) {
 
-				if(System.currentTimeMillis() - time == 200) {
-					//System.out.println("update view");
+				if(System.currentTimeMillis() - time == 1000) {
+					System.out.println("update view");
 					graphView.update(); 
 					time = System.currentTimeMillis();
 				}

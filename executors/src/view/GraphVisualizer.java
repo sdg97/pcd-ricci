@@ -26,8 +26,10 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -47,6 +49,8 @@ public class GraphVisualizer extends Application {
 	private static Master master;
 	private Set<String> nodes = new HashSet<String>();
 	private Set<Tuple2<String, String>> edges = new HashSet();
+	private List<String> nodesToAdd = new ArrayList();
+	private List<Tuple2<String, String>> edgesToAdd = new ArrayList();
 	private static Graph<String, String> g = new GraphEdgeList<String, String>();
 	private static SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
 	private final static SmartGraphPanel<String, String> graphView =  new SmartGraphPanel<>(g, strategy);;
@@ -59,7 +63,8 @@ public class GraphVisualizer extends Application {
 		for(String s : graph.getNodes()){
 			if(!nodes.contains(s)) {
 				nodes.add(s);
-				g.insertVertex(s);				
+				nodesToAdd.add(s);
+				//g.insertVertex(s);				
 			}
 			//System.out.println("Insert " + s);
 		}
@@ -69,20 +74,29 @@ public class GraphVisualizer extends Application {
 			System.out.println(t + "" +!edges.stream().anyMatch(i -> i.getFirst().equals(t.getFirst()) && i.getSecond().equals(t.getSecond())));
 
 			if(!edges.stream().anyMatch(i -> i.getFirst().equals(t.getFirst()) && i.getSecond().equals(t.getSecond()))) {
-				g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
+				//g.insertEdge(t.getSecond(), t.getFirst(),  t.getSecond()+t.getFirst());
 				edges.add(t);
+				edgesToAdd.add(t);
 			}
 			//System.out.println("I want to insert edge " + t.getFirst() + " to " + t.getSecond() );
 			//System.out.println("Vetex: " + g.vertices());
 		}
-		graphView.update();
-
+	
 	}
 	
 	public void update() {
-		if(updateCheck) {
-			graphView.applyCss();
-			updateCheck = false;
+		if(updateCheck && edgesToAdd.size() != 0) {
+			System.out.println("ADD VERTEX "  + nodesToAdd.get(0));
+			//g.insertVertex(nodesToAdd.get(0));
+			//nodesToAdd.remove(0);
+			Tuple2<String, String> edge = edgesToAdd.get(0);
+			Set<String> vertices = g.vertices().stream().map(v -> v.element()).collect(Collectors.toSet());
+			if(!vertices.contains(edge.getFirst())) g.insertVertex(edge.getFirst());
+			if(!vertices.contains(edge.getSecond())) g.insertVertex(edge.getSecond());
+			System.out.println("ADD EDGE ("  + edge.getFirst() + ", " + edge.getSecond() + ")");
+			g.insertEdge(edge.getSecond(), edge.getFirst(),  edge.getSecond()+edge.getFirst());
+			edgesToAdd.remove(0);
+			graphView.update();
 		}
 
 	}
