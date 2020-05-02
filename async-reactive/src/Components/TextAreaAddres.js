@@ -3,10 +3,11 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
+
 export class TextAreaAddress extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', depth: 0, mode: 'async' };
+    this.state = { value: '', depth: 0, mode: 'async', timeout: null, mainTitle:'' };
     this.handleValueChange = this.handleValueChange.bind(this);
     this.handleDepthChange = this.handleDepthChange.bind(this)
     this.handleModeChange = this.handleModeChange.bind(this)
@@ -59,6 +60,7 @@ export class TextAreaAddress extends React.Component {
         </FormControl>
         <button type="submit" onClick={e => {
           let title = this.getPageTitleFromUrl(this.state.value) 
+          this.setState={mainTitle:title}
           if (this.state.mode == 'async') {
             this.props.handleSubmitAsync(title, 0, this.state.depth)
           } else {
