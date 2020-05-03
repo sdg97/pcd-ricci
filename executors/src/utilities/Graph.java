@@ -1,7 +1,9 @@
 package utilities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Graph {
@@ -14,6 +16,10 @@ public class Graph {
 		this.edges = new HashSet<>();	
 	}
 	
+    public void addNode(Tuple2<String, Integer> n) {
+        this.nodes.add(n);
+    }
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void addNodes(Collection c) {
 		this.nodes.addAll(c);
@@ -43,5 +49,14 @@ public class Graph {
 		this.nodes = new HashSet<>();
 		this.edges = new HashSet<>();	
 	}
+	
+    public List<Tuple2<String, Integer>> getListNode(){
+        List<Tuple2<String, Integer>> l = new ArrayList<>();
+        for (Tuple2<String, Integer> t : this.nodes) {
+            l.add(t);
+        }
+        return l;
+    }
+
 
 }

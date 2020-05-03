@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -19,40 +18,42 @@ public class MasterImpl extends Thread implements Master{
 	private int depthLevel;
 	private Graph graph;
 	private GraphVisualizer gv;
+	private int poolSize;
 
 	public MasterImpl (int poolSize, GraphVisualizer gv) {	
-		this.executor = Executors.newFixedThreadPool(poolSize);
-		this.depthLevel = 1;
+		//this.executor = Executors.newFixedThreadPool(poolSize);
+		this.poolSize = poolSize;
+		this.depthLevel = 0;
 		this.graph = new Graph();
 		this.gv = gv;
 	}
 
 	public int compute(Tuple2<String, Integer> initTuple, int dl) throws InterruptedException, ExecutionException { 
-		
 		if (initTuple == null)
-			initTuple = new Tuple2<String, Integer>("Macchina", 1);
-		
-		this.depthLevel = dl;
-
+			return -1;
+		this.executor = Executors.newFixedThreadPool(poolSize);
+		this.depthLevel = 0;
+		this.graph = new Graph();
 	    Set<Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>>> resultSet = new HashSet<>();
 		ArrayList<Tuple2<String, Integer>> tuples = new ArrayList<>();
 		ArrayList<Tuple2<String, Integer>> tmp = new ArrayList<>();
 		Tuple2<String, ArrayList<Tuple2<String, Integer>>> t;
 		
-		tuples.add(new Tuple2<String, Integer>(initTuple.getFirst(), initTuple.getSecond()));
+		tuples.add(new Tuple2<String, Integer>(initTuple.getFirst().substring(30), initTuple.getSecond()));
 		graph.addNodes(tuples);
-
-		while(this.depthLevel > 0) {
+		gv.updateGraph(graph, depthLevel);
+		this.depthLevel++;
+		while(this.depthLevel <= dl) {
 			log("Depth level is " + this.depthLevel);
 			for(int i = 0; i < tuples.size(); i++) {
 				Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> res = executor.submit(new Tasks(tuples.get(i)));
 				resultSet.add(res);
-				//log(i + "******");
 			}
+
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
 				Graph tempGraph = new Graph();
-				tempGraph.addNodes(Arrays.asList(t.getFirst()));
+				tempGraph.addNode(new Tuple2<String, Integer>(t.getFirst(), this.depthLevel) );
 				for (Tuple2<String, Integer> tuple2 : t.getSecond()) {
 					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond()));
 				}
@@ -63,12 +64,12 @@ public class MasterImpl extends Thread implements Master{
 					tempGraph.addEdge(tempTuple);
 				}
 				tempGraph.addNodes(tuples);
-				if(gv != null) gv.updateGraph(tempGraph);
+				if(gv != null) gv.updateGraph(tempGraph, depthLevel);
 			}
 			tuples = tmp;
 			graph.addNodes(tuples);
-			this.depthLevel--;
-			resultSet = new HashSet<>();
+			this.depthLevel++;
+			resultSet.clear();
 		}
 
 

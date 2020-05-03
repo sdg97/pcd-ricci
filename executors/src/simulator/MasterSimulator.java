@@ -54,7 +54,7 @@ public class MasterSimulator implements Master{
 			t.getSecond().forEach(e -> {
 				graph.addEdge(new Tuple2<String, String>(e, t.getFirst()));				
 			});
-			gv.updateGraph(graph);
+			gv.updateGraph(graph, 1);
 		});
 		this.iteration++;
 		return 0;
