@@ -2,7 +2,6 @@ package main;
 
 
 import java.io.FileNotFoundException;
-import java.util.concurrent.ExecutionException;
 
 import model.MasterImpl;
 import view.GraphVisualizer;
@@ -20,7 +19,7 @@ public class Main {
 		graphView.setMaster(master);
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
-			long firstTime = time;
+			//long firstTime = time;
 			while(true) {
 
 				if(System.currentTimeMillis() - time >= 400) {

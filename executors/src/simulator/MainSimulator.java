@@ -3,8 +3,6 @@ package simulator;
 
 import java.io.FileNotFoundException;
 import java.util.concurrent.ExecutionException;
-
-import model.MasterImpl;
 import view.GraphVisualizer;
 
 
@@ -13,7 +11,6 @@ public class MainSimulator {
 	
 	public static void main(String[] args) throws InterruptedException {
 
-		int poolSize = Runtime.getRuntime().availableProcessors() + 1 ;
 
 		GraphVisualizer graphView = new GraphVisualizer();
 		MasterSimulator master = new MasterSimulator(graphView);
@@ -21,9 +18,7 @@ public class MainSimulator {
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
 			long firstTime = time;
-			boolean done = false;
 			while(true) {
-
 				if(System.currentTimeMillis() - time >= 400) {
 					try {
 						graphView.update();
@@ -41,7 +36,6 @@ public class MainSimulator {
 						e.printStackTrace();
 					}
 					firstTime = System.currentTimeMillis();
-					done = true;
 				}
 			}
 		

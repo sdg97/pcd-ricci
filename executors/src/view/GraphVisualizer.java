@@ -19,32 +19,23 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import jdk.nashorn.internal.runtime.FindProperty;
 import model.Master;
-import model.MasterImpl;
 import utilities.Tuple2;
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
 import com.brunomnsilva.smartgraph.graph.*;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
-import com.brunomnsilva.smartgraph.graphview.SmartGraphProperties;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
-import com.sun.javafx.geom.Edge;
-import com.sun.org.apache.xerces.internal.dom.DeepNodeListImpl;
 
 public class GraphVisualizer extends Application {
 
@@ -59,7 +50,6 @@ public class GraphVisualizer extends Application {
 	private final static SmartGraphPanel<String, String> graphView =  new SmartGraphPanel<>(g, strategy);
 	
 	private int nodeCount = 0;
-	private boolean reload = false;
 	//private boolean resized = false;
 	private static Label labelNum;
 	private static int depthLevel = 0;
@@ -293,7 +283,6 @@ public class GraphVisualizer extends Application {
 		}
 		Tuple2<String, Integer> t = new Tuple2<>(link, 1);
 		if(master != null) {
-			reload = true;
 			master.compute(t, depthLevel);
 		}
 	}

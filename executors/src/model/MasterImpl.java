@@ -51,7 +51,6 @@ public class MasterImpl extends Thread implements Master{
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
 				for (Tuple2<String, Integer> tuple2 : t.getSecond()) {
-					Tuple2<String, Integer> tmpTuple = new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond());
 					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond()));
 				}
 				
