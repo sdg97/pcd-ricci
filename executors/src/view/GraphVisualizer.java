@@ -19,7 +19,9 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import jdk.nashorn.internal.runtime.FindProperty;
 import model.Master;
+import model.MasterImpl;
 import utilities.Tuple2;
 
 import java.awt.Dimension;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -48,25 +51,133 @@ public class GraphVisualizer extends Application {
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Master master;
 	//private static SmartGraphProperties properties = new SmartGraphProperties();
-	private List<String> edges = new ArrayList<String>();
 	private List<Tuple2<String, String>> edgesToAdd = new ArrayList<Tuple2<String, String>>();
+	private List<Tuple2<String, String>> edgesToRemove = new ArrayList<Tuple2<String, String>>();
+	private Set<Tuple2<String, Set<String>>> nodes = new HashSet<Tuple2<String, Set<String>>>();	
 	private static Graph<String, String> g = new GraphEdgeList<String, String>();
 	private static SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
 	private final static SmartGraphPanel<String, String> graphView =  new SmartGraphPanel<>(g, strategy);
 	
 	private int nodeCount = 0;
+	private boolean reload = false;
 	//private boolean resized = false;
 	private static Label labelNum;
 	private static int depthLevel = 0;
 	private static String link = null;
 
 	public void updateGraph(utilities.Graph graph) {
-		for(Tuple2<String, String> t : graph.getEdges()) {
-			if(!edges.contains(t.getSecond() + t.getFirst())) {
-				edges.add(t.getSecond() + t.getFirst());
-				edgesToAdd.add(t);
+		String fatherName = graph.getEdges().stream().findFirst().get().getSecond();
+		if(!nodes.stream().map(n -> n.getFirst()).collect(Collectors.toSet()).contains(fatherName)) {
+			Tuple2<String, Set<String>> fatherNode = new Tuple2<String, Set<String>>(fatherName, new HashSet<String>());
+			nodes.add(fatherNode); 
+			for (Tuple2<String, String> childNode : graph.getEdges()) {
+				fatherNode.getSecond().add(childNode.getFirst());
+				edgesToAdd.add(childNode);
+			}
+		} else {
+			Set<String> tempChild = new HashSet<String>();
+			Tuple2<String, Set<String>> fatherNode = getNodeFromString(fatherName).get();
+			fatherNode.getSecond().forEach(c -> {
+				if(graph.getEdges().stream().map(e -> e.getFirst()).collect(Collectors.toSet()).contains(c)) {
+					tempChild.add(c);
+				} else {
+					edgesToRemove.add(new Tuple2<String, String>(c, fatherName));
+				}
+			});
+			fatherNode.getSecond().clear();
+			fatherNode.getSecond().addAll(tempChild);
+			for (Tuple2<String, String> childNode : graph.getEdges()) {
+				if(!fatherNode.getSecond().contains(childNode.getFirst())) {
+					System.out.println(fatherName + " ADD NEW CHILD " + childNode.getFirst());
+					fatherNode.getSecond().add(childNode.getFirst());
+					edgesToAdd.add(childNode);					
+				}
+			}
+			
+			System.out.println(edgesToRemove);
+		}
+	}
+	
+	private Optional<Tuple2<String, Set<String>>> getNodeFromString(String node) {
+		return nodes.stream().filter(n -> n.getFirst().equals(node)).findFirst();
+	}
+	
+	private Optional<com.brunomnsilva.smartgraph.graph.Edge<String, String>> getGraphEdge(String father, String child) {
+		return g.edges().stream().filter(e -> e.element().equals(father + child)).findFirst();
+	}
+	
+	private Optional<Vertex<String>> getGraphVertex(String node) {
+		return g.vertices().stream().filter(e -> e.element().equals(node)).findFirst();
+	}
+	
+	private boolean haveAnotherFather(String currentFather, String child) {
+		for (Tuple2<String, Set<String>> fatherNode : nodes) {
+			if(!fatherNode.getFirst().equals(currentFather)) {
+				if(fatherNode.getSecond().contains(child)) {
+					System.out.println(child + " HA COME ALTRO PADRE " + fatherNode.getFirst());
+					return true;					
+				}
+				System.out.println(child + " NON HA ALTRI PADRI");
+			} 
+		}
+		return false;
+	}
+	
+
+	
+	private void removeEdge(String father, String child) {
+		Optional<Tuple2<String, Set<String>>> edgeToRemove = getNodeFromString(child);
+		if(edgeToRemove.isPresent()) {
+			System.out.println( "CHILDREN TO REMOVE " + edgeToRemove.get().getSecond());
+			if(haveAnotherFather(father, child) ) {
+				if(getGraphEdge(father, child).isPresent()) {
+					System.out.println("REMOVE EDGE FROM " + father + " TO " + child);
+					g.removeEdge(getGraphEdge(father, child).get());										
+				}
+			}else {
+				for (String subChild : edgeToRemove.get().getSecond()) {
+					removeEdge(child, subChild);
+				}
+				Tuple2<String, Set<String>> fatherNode = getNodeFromString(father).get();
+				System.out.println("REMOVE VERTEX " + child);
+				fatherNode.getSecond().remove(child);
+				Set<Tuple2<String, Set<String>>> copyNodes = new HashSet<Tuple2<String,Set<String>>>(nodes);
+				for (Tuple2<String, Set<String>> tuple2 : copyNodes) {
+					if(tuple2.getFirst().equals(child)) nodes.remove(tuple2);
+				}
+				g.removeVertex(getGraphVertex(child).get());
+				nodeCount--;
+			}
+		} else {
+
+			if(haveAnotherFather(father, child) ) {
+				if(getGraphEdge(father, child).isPresent()) {
+					System.out.println("REMOVE EDGE FROM " + father + " TO " + child);
+					g.removeEdge(getGraphEdge(father, child).get());										
+				}
+			} else {
+				nodeCount--;
+				System.out.println("REMOVE VERTEX " + child);
+				if(getGraphVertex(child).isPresent()) {
+					g.removeVertex(getGraphVertex(child).get());															
+				}
 			}
 		}
+	}
+	
+	private void addEdge(String father, String child) {
+		if(!getGraphVertex(father).isPresent()) {
+			System.out.println("ADD VERTEX "  + father);
+			g.insertVertex(father);
+			nodeCount++;
+		}
+		if(!getGraphVertex(child).isPresent()) {
+			System.out.println("ADD VERTEX "  + child);
+			g.insertVertex(child);
+			nodeCount++;
+		}
+		System.out.println("ADD EDGE ("  + father + ", " + child + ")");
+		g.insertEdge(father, child,  father+child);
 	}
 
 	public void update() throws FileNotFoundException {
@@ -79,28 +190,17 @@ public class GraphVisualizer extends Application {
 			properties = new SmartGraphProperties(new FileInputStream(newFile));
 			System.out.println(properties.getVertexRadius());
 		}*/
-
 		if(edgesToAdd.size() != 0) {
-			Tuple2<String, String> edge = edgesToAdd.get(0);
-			Set<String> vertices = g.vertices().stream().map(v -> v.element()).collect(Collectors.toSet());
-			if(!vertices.contains(edge.getFirst())) {
-				System.out.println("ADD VERTEX "  + edge.getFirst());
-				g.insertVertex(edge.getFirst());
-				nodeCount++;
-			}
-			if(!vertices.contains(edge.getSecond())) {
-				System.out.println("ADD VERTEX "  + edge.getSecond());
-				g.insertVertex(edge.getSecond());
-				nodeCount++;
-			}
-			System.out.println("ADD EDGE ("  + edge.getFirst() + ", " + edge.getSecond() + ")");
-			g.insertEdge(edge.getSecond(), edge.getFirst(),  edge.getSecond()+edge.getFirst());
+			Tuple2<String, String> edgeToAdd = edgesToAdd.get(0);
+			addEdge(edgeToAdd.getSecond(), edgeToAdd.getFirst());
 			edgesToAdd.remove(0);
-			graphView.update();
-			System.out.println(nodeCount);
-			Platform.runLater(() -> labelNum.setText("" + nodeCount)) ;
-
+		} else if(edgesToRemove.size() != 0) {
+			Tuple2<String, String> edgeToRemove = edgesToRemove.get(0);
+			removeEdge(edgeToRemove.getSecond(), edgeToRemove.getFirst());
+			edgesToRemove.remove(0);
 		}
+		
+		Platform.runLater(() -> {labelNum.setText("" + nodeCount); graphView.update();}) ;
 	}
 
 	@Override
@@ -186,21 +286,15 @@ public class GraphVisualizer extends Application {
 		graphView.init();
 	}
 	
-	public void refresh() throws InterruptedException, ExecutionException, FileNotFoundException {
+	public void refresh() throws InterruptedException, ExecutionException {
 		if(link == null || depthLevel == 0) {
 			System.out.println("Not yet initialized");
 			return;
 		}
 		Tuple2<String, Integer> t = new Tuple2<>(link, 1);
 		if(master != null) {
-			Vertex<String> v1 = g.vertices().stream().collect(Collectors.toList()).get(0);
-			Vertex<String> v2 = g.vertices().stream().collect(Collectors.toList()).get(1);			System.out.println("" + v1.element() + v2.element());
-			String edgeToRemove = (v2.element() + v1.element());
-			System.out.println(edges.contains(v2.element() + v1.element()));
-			edges.remove(edgeToRemove);
-			graphView.update();
+			reload = true;
 			master.compute(t, depthLevel);
-	
 		}
 	}
 
