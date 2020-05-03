@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -50,22 +51,26 @@ public class MasterImpl extends Thread implements Master{
 			}
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
+				Graph tempGraph = new Graph();
+				tempGraph.addNodes(Arrays.asList(t.getFirst()));
 				for (Tuple2<String, Integer> tuple2 : t.getSecond()) {
 					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond()));
 				}
 				
 				for(Tuple2<String, Integer> n : t.getSecond()) {
-					//System.out.println("t First " + t.getFirst() + " n First " + n.getFirst());
-					graph.addEdge(new Tuple2<String, String>(n.getFirst(), t.getFirst()));
+					Tuple2<String, String> tempTuple = new Tuple2<String, String>(n.getFirst(), t.getFirst());
+					graph.addEdge(tempTuple);
+					tempGraph.addEdge(tempTuple);
 				}
+				tempGraph.addNodes(tuples);
+				if(gv != null) gv.updateGraph(tempGraph);
 			}
 			tuples = tmp;
 			graph.addNodes(tuples);
 			this.depthLevel--;
 			resultSet = new HashSet<>();
-			if(gv != null) 
-				gv.updateGraph(graph);
 		}
+
 
 		//System.out.println("Number of elem in resultSet" + result.size());
 		executor.shutdown();

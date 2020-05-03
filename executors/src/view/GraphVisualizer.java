@@ -56,6 +56,7 @@ public class GraphVisualizer extends Application {
 	private static String link = null;
 
 	public void updateGraph(utilities.Graph graph) {
+		System.out.println(graph.getEdges());
 		String fatherName = graph.getEdges().stream().findFirst().get().getSecond();
 		if(!nodes.stream().map(n -> n.getFirst()).collect(Collectors.toSet()).contains(fatherName)) {
 			Tuple2<String, Set<String>> fatherNode = new Tuple2<String, Set<String>>(fatherName, new HashSet<String>());
