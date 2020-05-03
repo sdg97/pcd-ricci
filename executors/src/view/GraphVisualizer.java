@@ -42,8 +42,8 @@ public class GraphVisualizer extends Application {
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static Master master;
 	//private static SmartGraphProperties properties = new SmartGraphProperties();
-	private List<Tuple2<String, String>> edgesToAdd = new ArrayList<Tuple2<String, String>>();
-	private List<Tuple2<String, String>> edgesToRemove = new ArrayList<Tuple2<String, String>>();
+	private Set<Tuple2<String, String>> edgesToAdd = new HashSet<Tuple2<String, String>>();
+	private Set<Tuple2<String, String>> edgesToRemove = new HashSet<Tuple2<String, String>>();
 	private Set<Tuple2<String, Set<String>>> nodes = new HashSet<Tuple2<String, Set<String>>>();	
 	private static Graph<String, String> g = new GraphEdgeList<String, String>();
 	private static SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
@@ -182,13 +182,13 @@ public class GraphVisualizer extends Application {
 			System.out.println(properties.getVertexRadius());
 		}*/
 		if(edgesToAdd.size() != 0) {
-			Tuple2<String, String> edgeToAdd = edgesToAdd.get(0);
-			addEdge(edgeToAdd.getSecond(), edgeToAdd.getFirst());
-			edgesToAdd.remove(0);
+			Optional<Tuple2<String, String>> edgeToAdd = edgesToAdd.stream().findFirst();
+			addEdge(edgeToAdd.get().getSecond(), edgeToAdd.get().getFirst());
+			edgesToAdd.remove(edgeToAdd.get());
 		} else if(edgesToRemove.size() != 0) {
-			Tuple2<String, String> edgeToRemove = edgesToRemove.get(0);
-			removeEdge(edgeToRemove.getSecond(), edgeToRemove.getFirst());
-			edgesToRemove.remove(0);
+			Optional<Tuple2<String, String>> edgeToRemove = edgesToRemove.stream().findFirst();
+			removeEdge(edgeToRemove.get().getSecond(), edgeToRemove.get().getFirst());
+			edgesToRemove.remove(edgeToRemove.get());
 		}
 		
 		Platform.runLater(() -> {labelNum.setText("" + nodeCount); graphView.update();}) ;
