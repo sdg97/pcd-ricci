@@ -3,14 +3,15 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
-
+const refreshTimeout = 20000
 export class TextAreaAddress extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', depth: 0, mode: 'async', timeout: null, mainTitle:'' };
+    this.state = { value: '', depth: 0, mode: 'async', interval: null, mainTitle: '' };
     this.handleValueChange = this.handleValueChange.bind(this);
     this.handleDepthChange = this.handleDepthChange.bind(this)
     this.handleModeChange = this.handleModeChange.bind(this)
+    this.onPlay = this.onPlay.bind(this)
   }
 
   handleValueChange(event) {
@@ -31,6 +32,37 @@ export class TextAreaAddress extends React.Component {
     return urlArray[urlArray.length - 1]
   }
 
+  onPlay() {
+    let title = this.getPageTitleFromUrl(this.state.value)
+    console.log('TITLE', title)
+    this.setState({ mainTitle: title },
+      () => {
+        if (this.state.interval != null) {
+          console.log('CLEAR INTERVAL')
+          clearInterval(this.state.interval)
+        }
+
+        let interval = setInterval(() => {
+          this.startResearch()
+        }, refreshTimeout)
+
+        this.setState({
+          interval: interval
+        })
+
+        this.startResearch()
+      })
+
+  }
+
+  startResearch() {
+    console.log('Title to search', this.state.mainTitle)
+    if (this.state.mode == 'async') {
+      this.props.handleSubmitAsync(this.state.mainTitle, 0, this.state.depth)
+    } else {
+      this.props.handleSubmitReactive(this.state.mainTitle, 0, this.state.depth)
+    }
+  }
 
   render() {
     return (
@@ -58,15 +90,7 @@ export class TextAreaAddress extends React.Component {
             <option value={'reactive'}>Reactve</option>
           </Select>
         </FormControl>
-        <button type="submit" onClick={e => {
-          let title = this.getPageTitleFromUrl(this.state.value) 
-          this.setState={mainTitle:title}
-          if (this.state.mode == 'async') {
-            this.props.handleSubmitAsync(title, 0, this.state.depth)
-          } else {
-            this.props.handleSubmitReactive(title, 0, this.state.depth)
-          }
-        }}>Play</button>
+        <button type="submit" onClick={this.onPlay}>Play</button>
       </div>
 
     )

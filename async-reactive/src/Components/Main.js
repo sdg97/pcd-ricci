@@ -70,9 +70,9 @@ export class Main extends React.Component {
         }
         let ref = []
 
-        try {     
+        try {
             let res = await axios.get(this.createUrlForPageInfo(title), config)
-    
+
             let link = res.data.parse.links
             for (let i = 0; i < link.length; i++) {
                 if (this.checkIfIsARealLink(link[i]))
@@ -84,6 +84,9 @@ export class Main extends React.Component {
         return ref
     }
 
+    check(node) {
+        return !this.state.nodes.includes({ id: node })
+    }
 
     addNode(node) {
         if (this.check(node)) {
@@ -96,9 +99,6 @@ export class Main extends React.Component {
         }
     }
 
-    check(node) {
-        return !this.state.nodes.includes({ id: node })
-    }
 
     addEdge(source, target) {
         setTimeout(() => {
@@ -108,11 +108,20 @@ export class Main extends React.Component {
         }, 1000);
     }
 
+    clearGraph() {
+        console.log('CLEAR')
+        this.setState({
+            nodes: [],
+            edges: [],
+            counter: 0,
+        })
+    }
+
     async asyncSearch(title, currDepth, maxDepth) {
         console.log('current Depth', currDepth)
 
         if (currDepth === 0) {
-            console.log("Async");
+            this.clearGraph()
             this.addNode(title)
         }
 
@@ -158,7 +167,7 @@ export class Main extends React.Component {
     reactiveSearch(title, currDepth, maxDepth) {
         console.log('current Depth', currDepth)
         if (currDepth === 0) {
-            console.log("Reactive");
+            this.clearGraph()
             this.addNode(title)
         }
         if (currDepth < maxDepth) {
