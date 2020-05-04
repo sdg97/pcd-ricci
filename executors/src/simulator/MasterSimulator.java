@@ -12,7 +12,6 @@ import view.GraphVisualizer;
 
 public class MasterSimulator implements Master{
 
-
 	private Graph graph;
 	private GraphVisualizer gv;
 	private int iteration;
@@ -67,7 +66,4 @@ public class MasterSimulator implements Master{
 	public int iterationsSize() {
 		return this.iterations.size();
 	}
-
 }
-
-

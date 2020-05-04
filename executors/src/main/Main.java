@@ -1,22 +1,17 @@
 package main;
 
-
 import java.io.FileNotFoundException;
 import java.util.concurrent.ExecutionException;
-
 import model.Master;
 import model.MasterImpl;
 import simulator.MasterSimulator;
 import view.GraphVisualizer;
 
-
 public class Main {
-
 	
 	public static void main(String[] args) throws InterruptedException {
 
 		int poolSize = Runtime.getRuntime().availableProcessors() + 1 ;
-
 		GraphVisualizer graphView = new GraphVisualizer();
 		Master master = new MasterImpl(poolSize, graphView);
 		MasterSimulator masterSimulator = new MasterSimulator(graphView);
@@ -28,22 +23,20 @@ public class Main {
 			while(true) {
 
 				if(System.currentTimeMillis() - time >= 400) {
-					//System.out.println("update view");
 					try {
 						graphView.update();
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
 					time = System.currentTimeMillis();
 				}
+				
+				/*Check if master simulator is active*/
 				if(masterSimulator.getIteration() > 0) {
-					//System.out.println("MAIN -> simulator it > 0");
 					if(System.currentTimeMillis() - firstTime >= 20000 && masterSimulator.getIteration() < masterSimulator.iterationsSize()) {
 						try {
 							graphView.refreshSimulator();
 						} catch (InterruptedException | ExecutionException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						firstTime = System.currentTimeMillis();
@@ -52,8 +45,7 @@ public class Main {
 			}
 		}).start();
 
-		graphView.play(args);
-				
+		graphView.play(args);				
 	}
 
 }

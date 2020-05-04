@@ -46,8 +46,8 @@ public class Graph {
 	}
 	
 	public void resetGraph() {
-		this.nodes = new HashSet<>();
-		this.edges = new HashSet<>();	
+		this.nodes.clear();
+		this.edges.clear();	
 	}
 	
     public List<Tuple2<String, Integer>> getListNode(){

@@ -21,7 +21,6 @@ public class MasterImpl extends Thread implements Master{
 	private int poolSize;
 
 	public MasterImpl (int poolSize, GraphVisualizer gv) {	
-		//this.executor = Executors.newFixedThreadPool(poolSize);
 		this.poolSize = poolSize;
 		this.depthLevel = 0;
 		this.graph = new Graph();
@@ -33,7 +32,9 @@ public class MasterImpl extends Thread implements Master{
 			return -1;
 		this.executor = Executors.newFixedThreadPool(poolSize);
 		this.depthLevel = 0;
-		this.graph = new Graph();
+		this.graph.resetGraph();
+		Graph tempGraph = new Graph();
+		
 	    Set<Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>>> resultSet = new HashSet<>();
 		ArrayList<Tuple2<String, Integer>> tuples = new ArrayList<>();
 		ArrayList<Tuple2<String, Integer>> tmp = new ArrayList<>();
@@ -41,10 +42,13 @@ public class MasterImpl extends Thread implements Master{
 		
 		tuples.add(new Tuple2<String, Integer>(initTuple.getFirst().substring(30), initTuple.getSecond()));
 		graph.addNodes(tuples);
+		log("Depth level is " + this.depthLevel);
 		gv.updateGraph(graph, depthLevel);
 		this.depthLevel++;
+		
 		while(this.depthLevel <= dl) {
 			log("Depth level is " + this.depthLevel);
+		
 			for(int i = 0; i < tuples.size(); i++) {
 				Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> res = executor.submit(new Tasks(tuples.get(i)));
 				resultSet.add(res);
@@ -52,8 +56,9 @@ public class MasterImpl extends Thread implements Master{
 
 			for(Future<Tuple2<String, ArrayList<Tuple2<String, Integer>>>> f : resultSet) {
 				t = f.get();
-				Graph tempGraph = new Graph();
-				tempGraph.addNode(new Tuple2<String, Integer>(t.getFirst(), this.depthLevel) );
+				tempGraph.resetGraph();
+				tempGraph.addNode(new Tuple2<String, Integer>(t.getFirst(), this.depthLevel));
+				
 				for (Tuple2<String, Integer> tuple2 : t.getSecond()) {
 					tmp.add(new Tuple2<String, Integer>(tuple2.getFirst(), tuple2.getSecond()));
 				}
@@ -72,16 +77,12 @@ public class MasterImpl extends Thread implements Master{
 			resultSet.clear();
 		}
 
-
-		//System.out.println("Number of elem in resultSet" + result.size());
 		executor.shutdown();
 		return 0;
 	}
 
-
-	@SuppressWarnings("unused")
 	private void log(String msg){
-		System.out.println("[SERVICE] "+msg);
+		System.out.println("[MASTER] "+msg);
 	}
 
 }

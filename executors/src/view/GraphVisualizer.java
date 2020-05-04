@@ -89,13 +89,11 @@ public class GraphVisualizer extends Application {
 				fatherNode.getSecond().addAll(tempChild);
 				for (Tuple2<String, String> childNode : graph.getEdges()) {
 					if(!fatherNode.getSecond().contains(childNode.getFirst())) {
-					//	System.out.println(fatherName + " ADD NEW CHILD " + childNode.getFirst());
 						fatherNode.getSecond().add(childNode.getFirst());
 						edgesToAdd.add(childNode);					
 					}
 				}
 
-			//	System.out.println(edgesToRemove);
 			}
 
 		}
@@ -118,10 +116,8 @@ public class GraphVisualizer extends Application {
 		for (Tuple2<String, Set<String>> fatherNode : nodes) {
 			if(!fatherNode.getFirst().equals(currentFather)) {
 				if(fatherNode.getSecond().contains(child)) {
-					System.out.println(child + " HA COME ALTRO PADRE " + fatherNode.getFirst());
 					return true;					
 				}
-				System.out.println(child + " NON HA ALTRI PADRI");
 			} 
 		}
 		return false;
@@ -130,10 +126,8 @@ public class GraphVisualizer extends Application {
 	private void removeEdge(String father, String child) {
 		Optional<Tuple2<String, Set<String>>> edgeToRemove = getNodeFromString(child);
 		if(edgeToRemove.isPresent()) {
-			System.out.println( "CHILDREN TO REMOVE " + edgeToRemove.get().getSecond());
 			if(haveAnotherFather(father, child) ) {
 				if(getGraphEdge(father, child).isPresent()) {
-					System.out.println("REMOVE EDGE FROM " + father + " TO " + child);
 					g.removeEdge(getGraphEdge(father, child).get());										
 				}
 			}else {
@@ -141,7 +135,6 @@ public class GraphVisualizer extends Application {
 					removeEdge(child, subChild);
 				}
 				Tuple2<String, Set<String>> fatherNode = getNodeFromString(father).get();
-				System.out.println("REMOVE VERTEX " + child);
 				fatherNode.getSecond().remove(child);
 				Set<Tuple2<String, Set<String>>> copyNodes = new HashSet<Tuple2<String,Set<String>>>(nodes);
 				for (Tuple2<String, Set<String>> tuple2 : copyNodes) {
@@ -153,12 +146,10 @@ public class GraphVisualizer extends Application {
 		} else {
 			if(haveAnotherFather(father, child) ) {
 				if(getGraphEdge(father, child).isPresent()) {
-					System.out.println("REMOVE EDGE FROM " + father + " TO " + child);
 					g.removeEdge(getGraphEdge(father, child).get());										
 				}
 			} else {
 				nodeCount--;
-				System.out.println("REMOVE VERTEX " + child);
 				if(getGraphVertex(child).isPresent()) {
 					g.removeVertex(getGraphVertex(child).get());															
 				}
@@ -168,16 +159,13 @@ public class GraphVisualizer extends Application {
 
 	private void addEdge(String father, String child) {
 		if(!getGraphVertex(father).isPresent()) {
-			//System.out.println("ADD VERTEX "  + father);
 			g.insertVertex(father);
 			nodeCount++;
 		}
 		if(!getGraphVertex(child).isPresent()) {
-			//System.out.println("ADD VERTEX "  + child);
 			g.insertVertex(child);
 			nodeCount++;
 		}
-		//System.out.println("ADD EDGE ("  + father + ", " + child + ")");
 		g.insertEdge(father, child,  father+child);
 	}
 
@@ -262,11 +250,11 @@ public class GraphVisualizer extends Application {
 				}
 			}
 		});
-		Button clearButton = new Button("Clear");
-		clearButton.setOnAction(new EventHandler<ActionEvent>() {
+		Button cleanButton = new Button("Clean");
+		cleanButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Clear");
+				System.out.println("Clean");
 				reset();
 			}
 		});
@@ -282,11 +270,10 @@ public class GraphVisualizer extends Application {
 
 		root.add(labelNodes, 7, 2);
 		root.add(labelNum, 7, 3);
-		root.add(clearButton, 7, 4);
+		root.add(cleanButton, 7, 4);
 		root.add(playSimulatorButton, 7, 5);
 		root.add(playButton, 7, 6);
 		Scene scene = new Scene(root, screenSize.getWidth()*0.7, screenSize.getWidth()*0.4);
-		System.out.println(graphView.getScene());
 		graphView.setAutomaticLayout(true);
 		scene.getStylesheets().add(getClass().getResource(File.separator + "smartgraph.css").toExternalForm());
 
@@ -319,7 +306,6 @@ public class GraphVisualizer extends Application {
 	public void setMasters(Master m, Master ms) {
 		master = m;
 		masterSimulator = ms;
-		//System.out.println("Master: " + master);
 	}
 
 	private void reset() {
@@ -335,7 +321,7 @@ public class GraphVisualizer extends Application {
 		edgesToAdd.clear();
 		edgesToRemove.clear();
 		nodes.clear();
-		Platform.runLater(() -> { graphView.update(); System.out.println("PLR - update");}) ;
+		Platform.runLater(() -> { graphView.update();}) ;
 	}
 
 	public void play(String[] args) {
