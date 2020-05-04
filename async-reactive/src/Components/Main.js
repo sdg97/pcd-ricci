@@ -27,7 +27,9 @@ export class Main extends React.Component {
         this.state = {
             nodes: [],
             edges: [],
-            counter: 0,
+            counter: [],
+            asyncResearches: [],
+            reactiveResearches: []
         }
         this.createUrlForPageInfo = this.createUrlForPageInfo.bind(this)
         this.checkIfIsARealLink = this.checkIfIsARealLink.bind(this)
@@ -84,32 +86,58 @@ export class Main extends React.Component {
         return ref
     }
 
-    check(node) {
-        return !this.state.nodes.includes({ id: node })
+    canInsertNode(node, nodes){
+        for(let i = 0; i < nodes.length; i++){
+            if(nodes[i].id == node){
+                return false
+            }
+        }
+
+        return true
+    }
+
+    canInsertEdges(source, target, edges){
+        for(let i = 0; i < edges.length; i++){
+            if(edges[i].source == source && edges[i].target == target){
+                return false
+            }
+        }
+
+        return true
     }
 
     addNode(node) {
-        if (this.check(node)) {
-            setTimeout(() => {
-
-                this.setState({
-                    nodes: [...this.state.nodes, { id: node }]
-                })
-            }, 1000);
-        }
-    }
-
-
-    addEdge(source, target) {
         setTimeout(() => {
-            this.setState({
-                edges: [...this.state.edges, { source: source, target: target }]
+            this.setState((state) => {
+                if (this.canInsertNode(node,state.nodes)) {
+                    console.log('il nodo ', node, 'non è prsente')
+                    let nodes = [...state.nodes, { id: node }]
+                    return {
+                        nodes: nodes,
+                        counter: nodes.length
+                    }
+                }
             })
         }, 1000);
     }
 
+    addEdge(source, target) {
+        setTimeout(() => {
+            this.setState((state) => {
+                if ( this.canInsertEdges(source, target, state.edges)) {
+                    let edges = [...state.edges, { source: source, target: target }]
+                    return {
+                        edges: edges
+                    }
+                }
+
+            })
+
+
+        }, 1000);
+    }
+
     clearGraph() {
-        console.log('CLEAR')
         this.setState({
             nodes: [],
             edges: [],
@@ -118,17 +146,14 @@ export class Main extends React.Component {
     }
 
     async asyncSearch(title, currDepth, maxDepth) {
-        console.log('current Depth', currDepth)
 
         if (currDepth === 0) {
-            this.clearGraph()
             this.addNode(title)
         }
 
         if (currDepth < maxDepth) {
             let res = await this.asyncGetPageReference(title);
-            let newCount = this.state.counter + 1
-            this.setState({ counter: newCount })
+
             for (let i = 0; i < res.length; i++) {
                 this.addNode(res[i])
             }
@@ -167,7 +192,6 @@ export class Main extends React.Component {
     reactiveSearch(title, currDepth, maxDepth) {
         console.log('current Depth', currDepth)
         if (currDepth === 0) {
-            this.clearGraph()
             this.addNode(title)
         }
         if (currDepth < maxDepth) {

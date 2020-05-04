@@ -1,6 +1,5 @@
 import React from 'react';
 import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 const refreshTimeout = 20000
@@ -34,11 +33,9 @@ export class TextAreaAddress extends React.Component {
 
   onPlay() {
     let title = this.getPageTitleFromUrl(this.state.value)
-    console.log('TITLE', title)
     this.setState({ mainTitle: title },
       () => {
         if (this.state.interval != null) {
-          console.log('CLEAR INTERVAL')
           clearInterval(this.state.interval)
         }
 
@@ -56,7 +53,6 @@ export class TextAreaAddress extends React.Component {
   }
 
   startResearch() {
-    console.log('Title to search', this.state.mainTitle)
     if (this.state.mode == 'async') {
       this.props.handleSubmitAsync(this.state.mainTitle, 0, this.state.depth)
     } else {
