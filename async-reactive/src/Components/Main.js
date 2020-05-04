@@ -134,15 +134,6 @@ export class Main extends React.Component {
         }, 1000);
     }
 
-    clearGraph() {
-        this.setState(state => {
-            return {
-                nodes: [],
-                edges: [],
-                counter: 0
-            }
-        })
-    }
 
     async asyncSearch(title, currDepth, maxDepth) {
 

@@ -68,12 +68,8 @@ startResearch(research) {
 }
 
 clear(){
-  this.setState((state) => {
-    for(let i = 0; i < state.researches; i++){
-      clearInterval(state.researches[i].interval)
-    }
-    return{researches:[]}
-  }, this.props.clearGraph())
+  window.location.reload(false);
+
 }
 
 render() {
