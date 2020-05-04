@@ -27,9 +27,9 @@ export class Main extends React.Component {
         this.state = {
             nodes: [],
             edges: [],
-            counter: [],
-            asyncResearches: [],
-            reactiveResearches: []
+            counter: 0,
+            asyncResearches: 0,
+            reactiveResearches: 0 
         }
         this.createUrlForPageInfo = this.createUrlForPageInfo.bind(this)
         this.checkIfIsARealLink = this.checkIfIsARealLink.bind(this)
@@ -92,7 +92,6 @@ export class Main extends React.Component {
                 return false
             }
         }
-
         return true
     }
 
@@ -132,16 +131,16 @@ export class Main extends React.Component {
                 }
 
             })
-
-
         }, 1000);
     }
 
     clearGraph() {
-        this.setState({
-            nodes: [],
-            edges: [],
-            counter: 0,
+        this.setState(state => {
+            return {
+                nodes: [],
+                edges: [],
+                counter: 0
+            }
         })
     }
 
