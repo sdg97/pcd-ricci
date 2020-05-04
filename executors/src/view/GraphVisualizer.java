@@ -291,11 +291,18 @@ public class GraphVisualizer extends Application {
 		graphView.init();
 	}
 
-	public void refreshSimulator() throws InterruptedException, ExecutionException {
+	public void refresh() throws InterruptedException, ExecutionException {
 		if(link == null) {
 			System.out.println("Not yet initialized");
 			return;
 		}
+		Tuple2<String, Integer> t = new Tuple2<>(link, 0);
+		if(master != null) {
+			master.compute(t, depthLevel);
+		}
+	}
+	
+	public void refreshSimulator() throws InterruptedException, ExecutionException {
 		Tuple2<String, Integer> t = new Tuple2<>(link, 0);
 		if(masterSimulator != null) {
 			masterSimulator.compute(t, depthLevel);

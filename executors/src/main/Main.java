@@ -20,6 +20,7 @@ public class Main {
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
 			long firstTime = time;
+			long refreshTime = time;
 			while(true) {
 
 				if(System.currentTimeMillis() - time >= 400) {
@@ -29,6 +30,15 @@ public class Main {
 						e.printStackTrace();
 					} 
 					time = System.currentTimeMillis();
+				}
+				
+				if(System.currentTimeMillis() - refreshTime >= 60000) {
+					try {
+						graphView.refresh();
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+					refreshTime = System.currentTimeMillis();
 				}
 				
 				/*Check if master simulator is active*/
