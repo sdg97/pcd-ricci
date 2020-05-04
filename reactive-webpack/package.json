@@ -19,6 +19,7 @@
     "@test/muse-js": "^0.1.1",
     "@test/protochannel": "^1.1.30",
     "acquisition": "^0.1.8",
+    "axios": "^0.19.2",
     "bootstrap": "^4.3.1",
     "channel": "^0.1.1",
     "copy-pkg-json-webpack-plugin": "0.0.38",
@@ -32,6 +33,8 @@
     "popper.js": "^1.16.0",
     "rxjs": "^6.5.5",
     "style-loader": "^1.0.0",
+    "three": "^0.116.1",
+    "three-spritetext": "^1.5.1",
     "typescript": "^3.7.2",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
