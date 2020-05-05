@@ -3,7 +3,8 @@ var SpriteText = require('three-spritetext').default
 var THREE = require('three')
 
 class Graph {
-    constructor(div) {
+    constructor(div, label) {
+        this.label = label
         const initData = {
             nodes: [],
             links: []
@@ -26,34 +27,31 @@ class Graph {
 
                 return obj;
             })
-            .graphData(initData);
+            .graphData(initData)
+            .linkDirectionalArrowLength(3.5)
+            .linkDirectionalArrowRelPos(1)
     }
 
-    checkNode(node, nodes){
-        console.log(nodes.filter(n => {console.log(n.id, node);return n.id = node}).length == 0)
-        if(! nodes.filter(n => {return n.id == node}).length == 0){
-            console.log('NON VA', )
-            console.log(nodes.filter(n => {console.log(n.id,node);return n.id == node}))
-        }
-        return nodes.filter(n => {return n.id == node}).length == 0
+    checkNode(node, nodes) {
+        return nodes.filter(n => { return n.id == node }).length == 0
     }
 
     addNode(node) {
         console.log('graph', node)
 
         const { nodes, links } = this.Graph.graphData();
-        if(this.checkNode(node, nodes)){
+        if (this.checkNode(node, nodes)) {
             this.Graph.graphData({
                 nodes: [...nodes, { id: node }],
                 links: links
             });
-        } 
 
-        console.log('nodi',nodes)
+            this.changeNumberOfNode(nodes.length + 1)
+        }
     }
 
-    changeColor() {
-
+    changeNumberOfNode(number) {
+        this.label.innerHTML = number
     }
 
     addLink(source, target) {
