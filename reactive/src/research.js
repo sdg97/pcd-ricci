@@ -1,5 +1,5 @@
-const defer = require('rxjs').defer
 const axios = require('axios').default
+const Observable = require('rxjs').Observable
 
 class Research {
     constructor(mainTitle, maxDepth, currDepth, source, target, subject) {
@@ -29,15 +29,29 @@ class Research {
                 'Content-Type': 'application/json',
             }
         }
-        return defer(async () => {
-            let ref = []
-            let res = await axios.get(this.createUrlForPageInfo(), config)
-            let link = res.data.parse.links
-            for (let i = 0; i < link.length; i++) {
-                if (this.checkIfIsARealLink(link[i]))
-                    ref.push(link[i]['*'])
-            }
-            return ref
+        // return defer(async () => {
+            // let ref = []
+            // let res = await axios.get(this.createUrlForPageInfo(), config)
+            // let link = res.data.parse.links
+            // for (let i = 0; i < link.length; i++) {
+            //     if (this.checkIfIsARealLink(link[i]))
+            //         ref.push(link[i]['*'])
+            // }
+        //     return ref
+        // })
+
+        return new Observable((observer) => {
+            axios.get(this.createUrlForPageInfo(), config).then((res) => {
+                let ref = []
+                let link = res.data.parse.links
+                console.log('links', link)
+                for (let i = 0; i < link.length; i++) {
+                    if (this.checkIfIsARealLink(link[i]))
+                        ref.push(link[i]['*'])
+                }
+                console.log('RIchiesta tesrmoanta')
+                observer.next(ref)
+            })
         })
     }
 
@@ -50,6 +64,7 @@ class Research {
         })
         if (this.currDepth < this.maxDepth) {
             this.reactiveGetPageReference().subscribe((res) => {
+                console.log('subscribe', res)
                 for (let i = 0; i < res.length; i++) {
                     let r = new Research(this.mainTitle, this.maxDepth, this.currDepth + 1, this.target, res[i], this.subject)
                     r.reactiveSearch()
