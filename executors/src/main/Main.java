@@ -8,7 +8,7 @@ import simulator.MasterSimulator;
 import view.GraphVisualizer;
 
 public class Main {
-	
+
 	public static void main(String[] args) throws InterruptedException {
 
 		int poolSize = Runtime.getRuntime().availableProcessors() + 1 ;
@@ -16,7 +16,7 @@ public class Main {
 		Master master = new MasterImpl(poolSize, graphView);
 		MasterSimulator masterSimulator = new MasterSimulator(graphView);
 		graphView.setMasters(master, masterSimulator);
-		
+
 		new Thread(() ->  {
 			long time = System.currentTimeMillis();
 			long firstTime = time;
@@ -31,16 +31,7 @@ public class Main {
 					} 
 					time = System.currentTimeMillis();
 				}
-				
-				if(System.currentTimeMillis() - refreshTime >= 60000) {
-					try {
-						graphView.refresh();
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					}
-					refreshTime = System.currentTimeMillis();
-				}
-				
+
 				/*Check if master simulator is active*/
 				if(masterSimulator.getIteration() > 0) {
 					if(System.currentTimeMillis() - firstTime >= 20000 && masterSimulator.getIteration() < masterSimulator.iterationsSize()) {
@@ -51,6 +42,13 @@ public class Main {
 						}
 						firstTime = System.currentTimeMillis();
 					}
+				} else if(System.currentTimeMillis() - refreshTime >= 60000) { /*Else i refresh Master*/
+					try {
+						graphView.refresh();
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+					refreshTime = System.currentTimeMillis();
 				}
 			}
 		}).start();
