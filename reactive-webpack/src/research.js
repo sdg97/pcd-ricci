@@ -12,7 +12,6 @@ class Research {
     }
 
     createUrlForPageInfo() {
-        console.log()
         return "https://it.wikipedia.org/w/api.php?action=parse&page=" + this.target + "&format=json&section=0&prop=links"
     }
 

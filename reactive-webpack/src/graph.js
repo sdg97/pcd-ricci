@@ -4,7 +4,7 @@ var THREE = require('three')
 
 class Graph {
     constructor(div, label) {
-        this.currentGroup 
+        this.currentGroup
         this.label = label
         const initData = {
             nodes: [],
@@ -14,13 +14,11 @@ class Graph {
         this.Graph = ForceGraph3D()(div)
             .nodeAutoColorBy('group')
             .nodeThreeObject(node => {
-                // use a sphere as a drag handle
                 const obj = new THREE.Mesh(
                     new THREE.SphereGeometry(10),
                     new THREE.MeshBasicMaterial({ depthWrite: false, transparent: true, opacity: 0 })
                 );
 
-                // add text sprite as child
                 const sprite = new SpriteText(node.id);
                 sprite.color = node.color;
                 sprite.textHeight = 8;
@@ -33,6 +31,11 @@ class Graph {
             .linkDirectionalArrowRelPos(1)
     }
 
+    getNodesNumber(){
+        const { nodes, links } = this.Graph.graphData();
+        return nodes.length
+    }
+
     checkNode(node, nodes) {
         return nodes.filter(n => { return n.id == node }).length == 0
     }
@@ -41,27 +44,29 @@ class Graph {
         const { nodes, links } = this.Graph.graphData();
         if (this.checkNode(node, nodes)) {
             this.Graph.graphData({
-                nodes: [...nodes, { id: node, group: group}],
+                nodes: [...nodes, { id: node, group: group }],
                 links: links
             });
-
-            this.changeNumberOfNode(nodes.length + 1)
         }
     }
 
-    changeNumberOfNode(number) {
-        this.label.innerHTML = number
-    }
+    checkLink(source, target, links) {
 
+        return links.filter(l => { 
+            return l.source == source && l.target == target 
+        }).length == 0
+
+
+    }
 
     addLink(source, target) {
         const { nodes, links } = this.Graph.graphData();
-        this.Graph.graphData({
-            nodes: nodes,
-            links: [...links, { source: source, target: target }]
-        });
-
-        console.log('link', links)
+        if(this.checkLink(source, target, links)){
+            this.Graph.graphData({
+                nodes: nodes,
+                links: [...links, { source: source, target: target }]
+            });
+        }
     }
 }
 

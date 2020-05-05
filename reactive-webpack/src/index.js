@@ -1,12 +1,10 @@
 const Graph = require('./graph')
 const Subject = require('rxjs').Subject
-const fromEvent = require('rxjs').fromEvent
-
 const takeUntil = require('rxjs/operators').takeUntil
 const Research = require('./research')
 
-
-const researches = []
+const intervalTimer = 20000
+const researcheInterval = []
 let graph
 let reciver
 let startClear = new Subject() 
@@ -17,10 +15,14 @@ start()
 
 
 function settings(){
+  researcheInterval.forEach((i) => {
+    clearInterval(i)
+  })
+  let label =  document.getElementById(nodeNumberLabelId)
+  label.innerHTML = 0
   reciver = new Subject()
-  graph = new Graph(document.getElementById(graphDivId), document.getElementById(nodeNumberLabelId))
+  graph = new Graph(document.getElementById(graphDivId))
   reciver.subscribe((res) =>{
-    console.log('RES RECIVED', res.target, res.source, res.mainTitle, res.mainTitle == res.target)
     if(res.mainTitle == res.target){
       graph.addNode(res.target, res.mainTitle)
     } else {
@@ -28,6 +30,8 @@ function settings(){
       graph.addNode(res.target, res.mainTitle)
       graph.addLink(res.source, res.target)
     }
+
+    label.innerHTML = graph.getNodesNumber()
   })
 
   reciver.pipe(takeUntil(startClear))
@@ -53,6 +57,12 @@ function startSearch() {
   let title = getPageTitleFromUrl(URL)
 
   let r = new Research(title, depth, 0, '', title, reciver)
+
+  let interval = setInterval(() => {
+    r.reactiveSearch()
+  }, intervalTimer)
+
+  researcheInterval.push(interval)
   r.reactiveSearch()
 }
 
