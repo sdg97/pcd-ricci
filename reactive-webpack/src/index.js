@@ -1,81 +1,49 @@
 const Graph = require('./graph')
-const defer = require('rxjs').defer
-const axios = require('axios').default
+const Subject = require('rxjs').Subject
+const fromEvent = require('rxjs').fromEvent
+
+const takeUntil = require('rxjs/operators').takeUntil
+const Research = require('./research')
+
 
 const researches = []
 let graph
+let reciver
+let startClear = new Subject() 
 const nodeNumberLabelId = "n_nodes"
 const graphDivId = "graph"
 
-createGraph()
+start()
 
-function createGraph() {
+
+function settings(){
+  reciver = new Subject()
+  graph = new Graph(document.getElementById(graphDivId), document.getElementById(nodeNumberLabelId))
+  reciver.subscribe((res) =>{
+    console.log('RES RECIVED', res.target, res.source, res.mainTitle, res.mainTitle == res.target)
+    if(res.mainTitle == res.target){
+      graph.addNode(res.target, res.mainTitle)
+    } else {
+      graph.addNode(res.source, res.mainTitle)
+      graph.addNode(res.target, res.mainTitle)
+      graph.addLink(res.source, res.target)
+    }
+  })
+
+  reciver.pipe(takeUntil(startClear))
+}
+
+function start() {
   document.addEventListener('DOMContentLoaded', function () {
-    console.log('GRAFO CREATOOOOOOOO')
-    graph = new Graph(document.getElementById(graphDivId), document.getElementById(nodeNumberLabelId))
+   settings()
   }, false);
 }
 
-function createUrlForPageInfo(title) {
-  console.log('URL', "https://it.wikipedia.org/w/api.php?action=parse&page=" + title + "&format=json&section=0&prop=links")
-  return "https://it.wikipedia.org/w/api.php?action=parse&page=" + title + "&format=json&section=0&prop=links"
-}
-
-function checkIfIsARealLink(pseudoLink) {
-  return pseudoLink['ns'] === 0
-}
 
 function getPageTitleFromUrl(url) {
   url.trim()
   let urlArray = url.split('/')
   return urlArray[urlArray.length - 1]
-}
-
-function reactiveGetPageReference(title) {
-  var config = {
-    headers: {
-      'Access-Control-Allow-Origin': 'http://localhost:5000',
-      'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-      'Access-Control-Allow-Credentials': true,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    }
-  }
-  return defer(async () => {
-    console.log('subscribe:)')
-    let ref = []
-    let res = await axios.get(createUrlForPageInfo(title), config)
-    let link = res.data.parse.links
-    for (let i = 0; i < link.length; i++) {
-      if (checkIfIsARealLink(link[i]))
-        ref.push(link[i]['*'])
-    }
-    return ref
-  })
-}
-
-function reactiveSearch(title, currDepth, maxDepth) {
-  if (currDepth === 0) {
-    graph.changeGroup(title)
-    graph.addNode(title)
-  }
-  if (currDepth < maxDepth) {
-    reactiveGetPageReference(title).subscribe((res) => {
-      for (let i = 0; i < res.length; i++) {
-        graph.addNode(res[i])
-      }
-      for (let i = 0; i < res.length; i++) {
-        graph.addLink(res[i], title)
-      }
-      for (let i = 0; i < res.length; i++) {
-        reactiveSearch(res[i], currDepth + 1, maxDepth)
-
-      }
-
-    }, (err) => {
-      console.log('CANNOT GET THE REQUESTED PAGE')
-    })
-  }
 }
 
 function startSearch() {
@@ -84,10 +52,16 @@ function startSearch() {
 
   let title = getPageTitleFromUrl(URL)
 
-  reactiveSearch(title, 0, depth)
+  let r = new Research(title, depth, 0, '', title, reciver)
+  r.reactiveSearch()
+}
+
+function clear(){
+  startClear.next(true)
+  settings()
 }
 
 
 module.exports = {
-  startSearch,
+  startSearch, clear
 }

@@ -37,13 +37,11 @@ class Graph {
         return nodes.filter(n => { return n.id == node }).length == 0
     }
 
-    addNode(node) {
-        console.log('graph', node)
-
+    addNode(node, group) {
         const { nodes, links } = this.Graph.graphData();
         if (this.checkNode(node, nodes)) {
             this.Graph.graphData({
-                nodes: [...nodes, { id: node, group: this.currentGroup }],
+                nodes: [...nodes, { id: node, group: group}],
                 links: links
             });
 
@@ -55,9 +53,6 @@ class Graph {
         this.label.innerHTML = number
     }
 
-    changeGroup(group){
-        this.currentGroup = group
-    }
 
     addLink(source, target) {
         const { nodes, links } = this.Graph.graphData();
