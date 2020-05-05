@@ -4,6 +4,7 @@ var THREE = require('three')
 
 class Graph {
     constructor(div, label) {
+        this.currentGroup 
         this.label = label
         const initData = {
             nodes: [],
@@ -42,7 +43,7 @@ class Graph {
         const { nodes, links } = this.Graph.graphData();
         if (this.checkNode(node, nodes)) {
             this.Graph.graphData({
-                nodes: [...nodes, { id: node }],
+                nodes: [...nodes, { id: node, group: this.currentGroup }],
                 links: links
             });
 
@@ -52,6 +53,10 @@ class Graph {
 
     changeNumberOfNode(number) {
         this.label.innerHTML = number
+    }
+
+    changeGroup(group){
+        this.currentGroup = group
     }
 
     addLink(source, target) {

@@ -2,19 +2,16 @@ const Graph = require('./graph')
 const defer = require('rxjs').defer
 const axios = require('axios').default
 
-
-
+const researches = []
 let graph
 const nodeNumberLabelId = "n_nodes"
 const graphDivId = "graph"
 
 createGraph()
 
-
-
-
 function createGraph() {
   document.addEventListener('DOMContentLoaded', function () {
+    console.log('GRAFO CREATOOOOOOOO')
     graph = new Graph(document.getElementById(graphDivId), document.getElementById(nodeNumberLabelId))
   }, false);
 }
@@ -59,6 +56,7 @@ function reactiveGetPageReference(title) {
 
 function reactiveSearch(title, currDepth, maxDepth) {
   if (currDepth === 0) {
+    graph.changeGroup(title)
     graph.addNode(title)
   }
   if (currDepth < maxDepth) {
