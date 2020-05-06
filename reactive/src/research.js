@@ -29,17 +29,7 @@ class Research {
                 'Content-Type': 'application/json',
             }
         }
-        // return defer(async () => {
-            // let ref = []
-            // let res = await axios.get(this.createUrlForPageInfo(), config)
-            // let link = res.data.parse.links
-            // for (let i = 0; i < link.length; i++) {
-            //     if (this.checkIfIsARealLink(link[i]))
-            //         ref.push(link[i]['*'])
-            // }
-        //     return ref
-        // })
-
+        
         return new Observable((observer) => {
             axios.get(this.createUrlForPageInfo(), config).then((res) => {
                 let ref = []

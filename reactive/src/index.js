@@ -2,7 +2,6 @@ const Graph = require('./graph')
 const Subject = require('rxjs').Subject
 const takeUntil = require('rxjs/operators').takeUntil
 const Research = require('./research')
-
 const intervalTimer = 20000
 const researcheInterval = []
 let graph
