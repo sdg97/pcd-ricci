@@ -3,7 +3,6 @@ Obiettivo del progetto è la realizzazione di un tool che, dato l’URL di una p
 
 
 ### Istruzioni per il lancio delle applicazioni
-
 - La prima consegna (executors) è stata realizzata in java e si trova all'interno della cartella ```src/executors```. Importare il progetto in Eclipse e lanciare la classe Main
 - La seconda consegna (programmazione asinrona) è stata realizzata attraverso una applicazione react. Aprendo una shell di comando ed entrando nella cartella ```src/async``` lanciare il comando ```npm install```. Installate tutte le dipendenze provvedere a lanciare il comando ```npm start```. Questo avvia un server sulla porta 3000 del pc. Aprire poi un browser all'indirizzo ```localhost:3000```.
 - La terza consegna è stata realizzata come una Web App che sfrutta Webpack come boundler dell'applicazione. Aprendo una shell di comando nella cartella ```src/reactive``` lanciare il comando ```npm install```. Installate tutte le dipendenze lanciare il comando ```npm run server```. Questo avvia un server sulla porta 5000 del pc. Aprire poi un browser all'indirizzo ```localhost:5000```. 
@@ -13,3 +12,4 @@ Si consiglia di utilizzare come browser Chrome. A causa delle CORS policy è nec
 - sistemi LINUX: ```google-chrome --user-data-dir=~/.config  --disable-web-security --disable-site-isolation-trials```.
 - sistemi MAC: ```open -na Google\ Chrome --args --user-data-dir= --disable-web-security --disable-site-isolation-trials```.
 - sistemi Windows (con cmd): ```"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --user-data-dir="c:/chromedev"```(gli apici sono necessari)
+
