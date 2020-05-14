@@ -27,7 +27,6 @@ export class Main extends React.Component {
             nodes: [],
             edges: [],
             counter: 0,
-            asyncResearches: 0,
         }
         this.createUrlForPageInfo = this.createUrlForPageInfo.bind(this)
         this.checkIfIsARealLink = this.checkIfIsARealLink.bind(this)

@@ -1,12 +1,9 @@
 import React from 'react';
-import Select from '@material-ui/core/Select';
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
+
 const refreshTimeout = 20000
 
 class Research {
   constructor() {
-    this.mode = undefined
     this.mainTitle = undefined
     this.interval = undefined
     this.depth = undefined
@@ -15,10 +12,9 @@ class Research {
 export class TextAreaAddress extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', depth: 0, mode: 'async', interval: null, mainTitle: '', researches: [] };
+    this.state = { value: '', depth: 0, interval: null, mainTitle: '', researches: [] };
     this.handleValueChange = this.handleValueChange.bind(this);
     this.handleDepthChange = this.handleDepthChange.bind(this)
-    this.handleModeChange = this.handleModeChange.bind(this)
     this.onPlay = this.onPlay.bind(this)
     this.clear = this.clear.bind(this)
   }
@@ -31,9 +27,6 @@ export class TextAreaAddress extends React.Component {
     this.setState({ depth: event.target.value });
   }
 
-  handleModeChange(event) {
-    this.setState({ mode: event.target.value })
-  }
 
   getPageTitleFromUrl(url) {
     url.trim()
@@ -45,10 +38,8 @@ export class TextAreaAddress extends React.Component {
     let research = new Research()
     this.setState((state) => {
       research.mainTitle = this.getPageTitleFromUrl(state.value)
-      research.mode = state.mode
       research.depth = state.depth
       research.interval = setInterval(() => {
-        console.log('refresh', research.mainTitle)
         this.startResearch(research)
       }, refreshTimeout)
 
@@ -59,7 +50,6 @@ export class TextAreaAddress extends React.Component {
 
 
 startResearch(research) {
-  console.log('start', research.mainTitle)
     this.props.handleSubmitAsync(research.mainTitle, 0, research.depth)
 }
 
