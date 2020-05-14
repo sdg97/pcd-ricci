@@ -34,12 +34,10 @@ class Research {
             axios.get(this.createUrlForPageInfo(), config).then((res) => {
                 let ref = []
                 let link = res.data.parse.links
-                console.log('links', link)
                 for (let i = 0; i < link.length; i++) {
                     if (this.checkIfIsARealLink(link[i]))
                         ref.push(link[i]['*'])
                 }
-                console.log('RIchiesta tesrmoanta')
                 observer.next(ref)
             })
         })
@@ -54,7 +52,6 @@ class Research {
         })
         if (this.currDepth < this.maxDepth) {
             this.reactiveGetPageReference().subscribe((res) => {
-                console.log('subscribe', res)
                 for (let i = 0; i < res.length; i++) {
                     let r = new Research(this.mainTitle, this.maxDepth, this.currDepth + 1, this.target, res[i], this.subject)
                     r.reactiveSearch()
